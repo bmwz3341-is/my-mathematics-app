@@ -16,7 +16,7 @@ export default function Home() {
       </div>
       <div className="flex flex-1 items-start justify-center px-6 -mt-16 sm:-mt-20">
         <Button
-          render={<Link href="/start" />}
+          render={<Link href="/HomePage" />}
           size="lg"
           className="h-16 w-full max-w-sm bg-blue-600 text-2xl hover:bg-blue-700 sm:w-1/3 sm:min-w-[220px]"
         >
