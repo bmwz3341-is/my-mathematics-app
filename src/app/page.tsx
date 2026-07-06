@@ -11,7 +11,7 @@ export default function Home() {
           <span className="text-5xl font-bold leading-none sm:text-6xl">₪</span>
         </span>
         <h1 className="text-4xl font-extrabold text-orange-500 sm:text-6xl md:text-7xl">
-          מתמטיקה,המרות ופתרון משוואות
+        All-in-One Power Calculator & Converter
         </h1>
       </div>
       <div className="flex flex-1 items-start justify-center px-6 -mt-16 sm:-mt-20">
