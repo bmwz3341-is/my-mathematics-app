@@ -11,7 +11,7 @@ export default function LengthConverter() {
     useLengthConverter();
 
   return (
-    <ConverterCard>
+    <ConverterCard accentColor="bg-green-300">
       <div className="text-right">
         <h2 className="text-xl font-bold text-blue-800">המרת אורך</h2>
 

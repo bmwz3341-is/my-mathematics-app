@@ -1,7 +1,6 @@
 import {
   Beaker,
   Clock,
-  Coins,
   Database,
   Gauge,
   LandPlot,
@@ -23,13 +22,6 @@ export interface ConversionConfig {
 }
 
 export const conversionsConfig: ConversionConfig[] = [
-  {
-    id: "currency",
-    label: "מטבעות",
-    icon: Coins,
-    color: "bg-cyan-600",
-    path: "/converter/currency",
-  },
   {
     id: "length",
     label: "אורך",

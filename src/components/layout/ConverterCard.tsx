@@ -6,13 +6,19 @@ import { ArrowRight } from "lucide-react";
 
 export interface ConverterCardProps {
   children: ReactNode;
+  accentColor?: string;
 }
 
-export default function ConverterCard({ children }: ConverterCardProps) {
+export default function ConverterCard({
+  children,
+  accentColor = "bg-white",
+}: ConverterCardProps) {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-6 py-8 sm:px-10">
+    <div
+      className={`flex min-h-screen items-center justify-center px-6 py-8 sm:px-10 ${accentColor}`}
+    >
       <div className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-6 shadow-xl">
         {children}
 
