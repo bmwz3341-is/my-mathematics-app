@@ -130,11 +130,9 @@ export default function HomePage() {
         </div>
         <button
           type="button"
-          onClick={() => {
-            if (activeTab === "conversions") {
-              router.push("/AllConversions");
-            }
-          }}
+          onClick={() =>
+            router.push(activeTab === "conversions" ? "/AllConversions" : "/mathematics")
+          }
           className="mt-6 w-full rounded-xl bg-blue-50 py-3 text-center text-lg font-bold text-blue-600 transition hover:brightness-95 active:brightness-90"
         >
           {activeTab === "conversions" ? "כל ההמרות" : "מתמטיקה"}
