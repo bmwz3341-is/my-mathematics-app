@@ -1,13 +1,30 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
-import { ArrowRight } from "lucide-react";
-import SolvingEquations from "@/components/mathematics/SolvingEquations";
+import { ArrowRight, Search, X } from "lucide-react";
+import { mathItems, type MathItem } from "@/config/mathematicsData";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
 export default function MathematicsPage() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const filteredItems = useMemo(() => {
+    const q = query.trim();
+    if (!q) return mathItems;
+    return mathItems.filter((item) => item.label.includes(q));
+  }, [query]);
+
+  function handleSelect(item: MathItem) {
+    if (item.href) {
+      router.push(item.href);
+    }
+  }
+
   return (
     <div
       dir="rtl"
@@ -20,15 +37,64 @@ export default function MathematicsPage() {
       <div className="pointer-events-none absolute -bottom-24 -right-24 size-80 rounded-full bg-cyan-200/40 blur-3xl" />
 
       <div className="relative">
-        <h1 className="text-right text-2xl font-extrabold text-slate-800 sm:text-3xl">
+        <h1 className="text-right text-2xl font-extrabold text-orange-500 sm:text-3xl">
           פתרון משוואות וחישובים
         </h1>
-        <p className="mt-4 text-right text-sm font-medium text-slate-600">
-          הזינו משוואה לינארית או ביטוי חשבוני וקבלו פתרון מיידי
-        </p>
 
-        <div className="mt-6">
-          <SolvingEquations />
+        <div className="relative mt-6">
+          <Search className="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="חפשו כלי מתמטי..."
+            aria-label="חיפוש כלי מתמטי"
+            className="w-full rounded-2xl border border-white/60 bg-white/35 py-3 pr-11 pl-11 text-right text-base font-bold text-slate-800 placeholder:font-bold placeholder:text-slate-400 backdrop-blur-xl backdrop-saturate-150 focus:border-white/90 focus:outline-none"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="נקה חיפוש"
+              className="absolute left-3 top-1/2 flex -translate-y-1/2 items-center justify-center text-slate-400 hover:text-slate-700"
+            >
+              <X className="size-5" />
+            </button>
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3">
+          {filteredItems.length === 0 ? (
+            <p className="py-6 text-center text-sm text-slate-500">לא נמצאו תוצאות</p>
+          ) : (
+            filteredItems.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleSelect(item)}
+                aria-disabled={item.comingSoon ? "true" : "false"}
+                className={`flex w-full items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/35 px-4 py-4 text-right backdrop-blur-xl backdrop-saturate-150 transition ${
+                  item.comingSoon ? "opacity-60" : "hover:bg-white/55"
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  <span
+                    className={`flex size-9 items-center justify-center rounded-full ${item.color}`}
+                  >
+                    <item.icon className="size-5 text-white" strokeWidth={2} />
+                  </span>
+                  <span className="text-base font-bold text-slate-800">{item.label}</span>
+                </span>
+                {item.comingSoon ? (
+                  <span className="rounded-full bg-white/60 px-2 py-1 text-xs font-bold text-slate-500">
+                    בקרוב
+                  </span>
+                ) : (
+                  <span className="text-slate-400">‹</span>
+                )}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
