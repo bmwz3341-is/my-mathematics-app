@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sigma } from "lucide-react";
 import { solveMathInput, type SolveResult } from "@/lib/equationSolver";
+import EquationGraph from "@/components/mathematics/EquationGraph";
 
 const EXAMPLES = ["2x + 3 = 7", "3*(x - 2) = 9", "12 / 4 + 5", "5x - 1 = 3x + 9"];
 
@@ -86,6 +87,33 @@ export default function SolvingEquations() {
           )}
           {result.type === "error" && <p className="text-sm font-bold">{result.message}</p>}
         </div>
+      )}
+
+      {result?.type === "equation" && result.steps.length > 1 && (
+        <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
+          <p className="text-right text-sm font-extrabold text-black">דרך הפתרון:</p>
+          <ol className="mt-2 space-y-1">
+            {result.steps.map((step, index) => (
+              <li key={index} className="flex flex-row-reverse items-center gap-2">
+                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#2F6FED] text-xs font-bold text-white">
+                  {index + 1}
+                </span>
+                <span dir="ltr" className="font-mono text-base font-bold text-slate-700">
+                  {step}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {result?.type === "equation" && (
+        <EquationGraph
+          left={result.left}
+          right={result.right}
+          variable={result.variable}
+          x={result.x}
+        />
       )}
     </div>
   );

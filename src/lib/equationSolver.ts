@@ -12,13 +12,20 @@ type Token =
   | { type: "rparen" };
 
 /** Represents the linear form `a*x + b`. */
-interface Linear {
+export interface Linear {
   a: number;
   b: number;
 }
 
 export type SolveResult =
-  | { type: "equation"; variable: string; x: number }
+  | {
+      type: "equation";
+      variable: string;
+      x: number;
+      steps: string[];
+      left: Linear;
+      right: Linear;
+    }
   | { type: "value"; value: number }
   | { type: "error"; message: string };
 
@@ -117,7 +124,14 @@ function power(base: Linear, exponent: Linear): Linear {
   return CONST(Math.pow(base.b, exponent.b));
 }
 
-function parseLinearExpression(tokens: Token[]): Linear {
+/** Parse result: the collected linear form plus the top-level additive terms
+ * (each already expanded, e.g. "3(x-2)+4" -> [{a:3,b:-6},{a:0,b:4}]). */
+interface ParsedSide {
+  value: Linear;
+  terms: Linear[];
+}
+
+function parseLinearExpression(tokens: Token[]): ParsedSide {
   let pos = 0;
   const peek = () => tokens[pos];
   const consume = () => tokens[pos++];
@@ -178,22 +192,99 @@ function parseLinearExpression(tokens: Token[]): Linear {
     return value;
   }
 
-  function parseAddSub(): Linear {
+  function parseAddSub(collect?: Linear[]): Linear {
     let value = parseMulDiv();
+    collect?.push(value);
     while (true) {
       const t = peek();
       if (t && t.type === "op" && (t.value === "+" || t.value === "-")) {
         consume();
         const rhs = parseMulDiv();
         value = t.value === "+" ? add(value, rhs) : sub(value, rhs);
+        collect?.push(t.value === "+" ? rhs : negate(rhs));
       } else break;
     }
     return value;
   }
 
-  const result = parseAddSub();
+  const terms: Linear[] = [];
+  const result = parseAddSub(terms);
   if (pos !== tokens.length) throw new Error("תווים מיותרים בסוף הביטוי");
-  return result;
+  return { value: result, terms };
+}
+
+function formatStepNumber(n: number): string {
+  const rounded = Math.round(n * 1e8) / 1e8;
+  return rounded.toLocaleString("en-US", { maximumFractionDigits: 8 });
+}
+
+/** Formats `a*x + b` as a readable expression, e.g. "2x + 3". */
+export function formatLinear(l: Linear, variable: string): string {
+  const parts: string[] = [];
+  if (l.a !== 0) {
+    if (l.a === 1) parts.push(variable);
+    else if (l.a === -1) parts.push(`-${variable}`);
+    else parts.push(`${formatStepNumber(l.a)}${variable}`);
+  }
+  if (l.b !== 0 || parts.length === 0) {
+    if (parts.length === 0) parts.push(formatStepNumber(l.b));
+    else parts.push(l.b > 0 ? `+ ${formatStepNumber(l.b)}` : `- ${formatStepNumber(-l.b)}`);
+  }
+  return parts.join(" ");
+}
+
+/** Formats expanded top-level terms before collection, e.g. "3x - 6 + 4". */
+function formatTerms(terms: Linear[], variable: string): string {
+  const atoms: number[] = [];
+  const isVar: boolean[] = [];
+  for (const t of terms) {
+    if (t.a !== 0) {
+      atoms.push(t.a);
+      isVar.push(true);
+    }
+    if (t.b !== 0 || t.a === 0) {
+      atoms.push(t.b);
+      isVar.push(false);
+    }
+  }
+  if (atoms.length === 0) return "0";
+  let out = "";
+  atoms.forEach((v, i) => {
+    const abs = Math.abs(v);
+    const body = isVar[i]
+      ? abs === 1
+        ? variable
+        : `${formatStepNumber(abs)}${variable}`
+      : formatStepNumber(abs);
+    if (i === 0) out = v < 0 ? `-${body}` : body;
+    else out += v < 0 ? ` - ${body}` : ` + ${body}`;
+  });
+  return out;
+}
+
+function buildSteps(
+  rawLeft: string,
+  rawRight: string,
+  leftSide: ParsedSide,
+  rightSide: ParsedSide,
+  combined: Linear,
+  variable: string,
+  x: number,
+): string[] {
+  const left = leftSide.value;
+  const right = rightSide.value;
+  const steps: string[] = [`${rawLeft} = ${rawRight}`];
+  const push = (s: string) => {
+    if (s !== steps[steps.length - 1]) steps.push(s);
+  };
+  push(`${formatTerms(leftSide.terms, variable)} = ${formatTerms(rightSide.terms, variable)}`);
+  push(`${formatLinear(left, variable)} = ${formatLinear(right, variable)}`);
+  push(`${formatLinear({ a: combined.a, b: 0 }, variable)} = ${formatStepNumber(-combined.b)}`);
+  if (combined.a !== 1) {
+    push(`${variable} = ${formatStepNumber(-combined.b)} / ${formatStepNumber(combined.a)}`);
+  }
+  push(`${variable} = ${formatStepNumber(x)}`);
+  return steps;
 }
 
 function detectVariable(input: string): string {
@@ -222,9 +313,9 @@ export function solveMathInput(input: string): SolveResult {
   try {
     if (equalsCount === 1) {
       const [left, right] = trimmed.split("=");
-      const leftLinear = parseLinearExpression(tokenize(left, variable));
-      const rightLinear = parseLinearExpression(tokenize(right, variable));
-      const combined = sub(leftLinear, rightLinear); // a*x + b = 0
+      const leftSide = parseLinearExpression(tokenize(left, variable));
+      const rightSide = parseLinearExpression(tokenize(right, variable));
+      const combined = sub(leftSide.value, rightSide.value); // a*x + b = 0
       if (combined.a === 0) {
         if (combined.b === 0) {
           return { type: "error", message: "לכל x קיים פתרון (זהות)" };
@@ -232,10 +323,17 @@ export function solveMathInput(input: string): SolveResult {
         return { type: "error", message: "אין פתרון למשוואה זו" };
       }
       const x = -combined.b / combined.a;
-      return { type: "equation", variable, x };
+      return {
+        type: "equation",
+        variable,
+        x,
+        steps: buildSteps(left.trim(), right.trim(), leftSide, rightSide, combined, variable, x),
+        left: leftSide.value,
+        right: rightSide.value,
+      };
     }
 
-    const linear = parseLinearExpression(tokenize(trimmed, variable));
+    const linear = parseLinearExpression(tokenize(trimmed, variable)).value;
     if (linear.a !== 0) {
       return { type: "error", message: "יש להזין ביטוי מספרי בלבד, או משוואה עם סימן =" };
     }

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"$HOME/AppData/Local/npm-cache/_npx\" -maxdepth 3 -iname \"playwright\" 2>/dev/null | head; ls \"$HOME/AppData/Local/npm-cache/_npx\" 2>/dev/null | head)",
+      "Read(//c/Users/bmwz3/AppData/Local/npm-cache/_npx/**)",
+      "Bash(tasklist)",
+      "Bash(curl -s -m 8 http://localhost:3000/mathematics -o /dev/null -w \"HTTP %{http_code} in %{time_total}s\\\\n\")",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\" | Select-Object ProcessId, @{N='Cmd';E={$_.CommandLine.Substring\\(0, [Math]::Min\\(160, $_.CommandLine.Length\\)\\)}} | Format-List)"
+    ]
+  }
+}

@@ -15,7 +15,7 @@ const DEFAULT_RECENT_IDS = ["currency", "length", "weight"];
 
 export default function HomePage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"conversions" | "math">(
+  const [activeTab, setActiveTab] = useState<"conversions" | "math" | "trigo">(
     "conversions",
   );
   const [recentItems, setRecentItems] = useState<AllConversionItem[]>([]);
@@ -62,11 +62,22 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-        <div className="mt-6 flex flex-row-reverse rounded-xl border-2 border-blue-200 bg-blue-50 p-1">
+        <div className="mt-6 grid grid-cols-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab("trigo")}
+            className={`rounded-lg py-2 text-lg font-bold transition ${
+              activeTab === "trigo"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "text-purple-600"
+            }`}
+          >
+            טריגונומטריה והנדסה
+          </button>
           <button
             type="button"
             onClick={() => setActiveTab("math")}
-            className={`flex-1 rounded-lg py-2 text-lg font-bold transition ${
+            className={`rounded-lg py-2 text-lg font-bold transition ${
               activeTab === "math"
                 ? "bg-blue-600 text-white shadow-sm"
                 : "text-purple-600"
@@ -77,7 +88,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setActiveTab("conversions")}
-            className={`flex-1 rounded-lg py-2 text-lg font-bold transition ${
+            className={`rounded-lg py-2 text-lg font-bold transition ${
               activeTab === "conversions"
                 ? "bg-blue-600 text-white shadow-sm"
                 : "text-purple-600"
@@ -131,11 +142,21 @@ export default function HomePage() {
         <button
           type="button"
           onClick={() =>
-            router.push(activeTab === "conversions" ? "/AllConversions" : "/mathematics")
+            router.push(
+              activeTab === "conversions"
+                ? "/AllConversions"
+                : activeTab === "math"
+                  ? "/mathematics"
+                  : "/Trigo",
+            )
           }
           className="mt-6 w-full rounded-xl bg-blue-50 py-3 text-center text-lg font-bold text-blue-600 transition hover:brightness-95 active:brightness-90"
         >
-          {activeTab === "conversions" ? "כל ההמרות" : "מתמטיקה"}
+          {activeTab === "conversions"
+            ? "כל ההמרות"
+            : activeTab === "math"
+              ? "מתמטיקה"
+              : "טריגונומטריה והנדסה"}
           <span className="ms-2 text-blue-800">{">>"}</span>
         </button>
       </div>

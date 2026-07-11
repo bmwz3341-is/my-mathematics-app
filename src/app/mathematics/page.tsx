@@ -63,6 +63,27 @@ export default function MathematicsPage() {
           )}
         </div>
 
+        {!query.trim() && (
+          <div
+            aria-label="כלים מתמטיים"
+            className="mt-5 flex flex-row-reverse gap-2 overflow-x-auto pb-1"
+          >
+            {mathItems.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleSelect(item)}
+                aria-disabled={item.comingSoon ? "true" : "false"}
+                className={`shrink-0 rounded-full border border-white/60 bg-white/30 px-4 py-2 text-sm font-bold text-slate-600 backdrop-blur-xl transition ${
+                  item.comingSoon ? "opacity-60" : "hover:bg-white/50"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="mt-4 flex flex-col gap-3">
           {filteredItems.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">לא נמצאו תוצאות</p>
