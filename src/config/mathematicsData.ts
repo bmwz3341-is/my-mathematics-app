@@ -1,4 +1,4 @@
-import { Calculator, ChartArea, ChartLine, ChartSpline, Crosshair, GitMerge, Logs, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
+import { Calculator, ChartArea, ChartLine, ChartSpline, Crosshair, GitMerge, Logs, Orbit, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface MathItem {
@@ -94,5 +94,12 @@ export const mathItems: MathItem[] = [
     icon: ChartSpline,
     color: "bg-amber-500",
     href: "/mathematics/geometric-sequences",
+  },
+  {
+    id: "complexNumbers",
+    label: "מספרים מרוכבים",
+    icon: Orbit,
+    color: "bg-violet-500",
+    href: "/mathematics/complex-numbers",
   },
 ];
