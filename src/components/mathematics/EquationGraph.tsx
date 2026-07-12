@@ -1,6 +1,6 @@
 "use client";
 
-import { formatLinear, type Linear } from "@/lib/equationSolver";
+import { formatNumericLinear, type NumericLinear } from "@/lib/equationSolver";
 
 const LEFT_COLOR = "#2F6FED";
 const RIGHT_COLOR = "#d95926";
@@ -33,8 +33,8 @@ function ticks(min: number, max: number, avoid: number): number[] {
 }
 
 interface EquationGraphProps {
-  left: Linear;
-  right: Linear;
+  left: NumericLinear;
+  right: NumericLinear;
   variable: string;
   x: number;
 }
@@ -63,8 +63,8 @@ export default function EquationGraph({ left, right, variable, x }: EquationGrap
   const sx = (v: number) => P + ((v - xMin) / (xMax - xMin)) * (W - 2 * P);
   const sy = (v: number) => H - P - ((v - yMin) / (yMax - yMin)) * (H - 2 * P);
 
-  const leftLabel = `y = ${formatLinear(left, variable)}`;
-  const rightLabel = `y = ${formatLinear(right, variable)}`;
+  const leftLabel = `y = ${formatNumericLinear(left, variable)}`;
+  const rightLabel = `y = ${formatNumericLinear(right, variable)}`;
 
   return (
     <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">

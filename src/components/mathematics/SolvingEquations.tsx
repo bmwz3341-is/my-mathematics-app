@@ -2,14 +2,27 @@
 
 import { useState } from "react";
 import { Sigma } from "lucide-react";
-import { solveMathInput, type SolveResult } from "@/lib/equationSolver";
+import { solveMathInput, symLinearToNumeric, type SolveResult } from "@/lib/equationSolver";
 import EquationGraph from "@/components/mathematics/EquationGraph";
 
-const EXAMPLES = ["2x + 3 = 7", "3*(x - 2) = 9", "12 / 4 + 5", "5x - 1 = 3x + 9"];
+const EXAMPLES = [
+  "2x + 3 = 7",
+  "3*(x - 2) = 9",
+  "5x - 1 = 3x + 9",
+  "x/2 + 1/3 = 5",
+  "2x + a = 5",
+  "|2x - 1| = 7",
+];
 
 function formatNumber(n: number): string {
   const rounded = Math.round(n * 1e8) / 1e8;
   return rounded.toLocaleString("en-US", { maximumFractionDigits: 8 });
+}
+
+const SUBSCRIPTS = ["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉"];
+
+function subscript(n: number): string {
+  return String(n).split("").map((d) => SUBSCRIPTS[Number(d)]).join("");
 }
 
 export default function SolvingEquations() {
@@ -75,11 +88,13 @@ export default function SolvingEquations() {
               : "bg-[#2F6FED] text-white shadow-[0_0_18px_rgba(47,111,237,0.5)]"
           }`}
         >
-          {result.type === "equation" && (
-            <p dir="ltr" className="text-2xl font-extrabold">
-              {result.variable} = {formatNumber(result.x)}
-            </p>
-          )}
+          {result.type === "equation" &&
+            result.solutions.map((sol, index) => (
+              <p key={index} dir="ltr" className="text-2xl font-extrabold">
+                {result.variable}
+                {result.solutions.length > 1 ? subscript(index + 1) : ""} = {sol.xDisplay}
+              </p>
+            ))}
           {result.type === "value" && (
             <p dir="ltr" className="text-2xl font-extrabold">
               = {formatNumber(result.value)}
@@ -107,14 +122,23 @@ export default function SolvingEquations() {
         </div>
       )}
 
-      {result?.type === "equation" && (
-        <EquationGraph
-          left={result.left}
-          right={result.right}
-          variable={result.variable}
-          x={result.x}
-        />
-      )}
+      {result?.type === "equation" &&
+        !result.hasParams &&
+        result.solutions.length === 1 &&
+        result.solutions[0].xNumeric !== undefined &&
+        (() => {
+          const numericLeft = symLinearToNumeric(result.left);
+          const numericRight = symLinearToNumeric(result.right);
+          if (!numericLeft || !numericRight) return null;
+          return (
+            <EquationGraph
+              left={numericLeft}
+              right={numericRight}
+              variable={result.variable}
+              x={result.solutions[0].xNumeric as number}
+            />
+          );
+        })()}
     </div>
   );
 }

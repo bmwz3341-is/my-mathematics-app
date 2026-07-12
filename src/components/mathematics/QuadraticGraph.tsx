@@ -5,6 +5,7 @@ import { evalPolynomial, type Term } from "@/lib/derivative";
 const CURVE_COLOR = "#2F6FED";
 const ROOT_COLOR = "#dc2626";
 const YINT_COLOR = "#16a34a";
+const VERTEX_COLOR = "#7c3aed";
 
 function formatNumber(n: number): string {
   const rounded = Math.round(n * 1e4) / 1e4;
@@ -50,6 +51,7 @@ export default function QuadraticGraph({ a, b, c, roots, variable }: QuadraticGr
     { coefficient: b, power: 1 },
     { coefficient: c, power: 0 },
   ];
+  const vertexY = evalPolynomial(terms, vertexX);
 
   const W = 340;
   const H = 260;
@@ -93,12 +95,18 @@ export default function QuadraticGraph({ a, b, c, roots, variable }: QuadraticGr
           <span className="h-0.5 w-5 rounded-full" style={{ backgroundColor: CURVE_COLOR }} />
           <span className="font-mono text-xs font-bold text-slate-700">{equationLabel}</span>
         </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2.5 rounded-full" style={{ backgroundColor: VERTEX_COLOR }} />
+          <span className="font-mono text-xs font-bold text-slate-700">
+            קודקוד ({formatNumber(vertexX)}, {formatNumber(vertexY)})
+          </span>
+        </span>
       </div>
 
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label={`גרף הפרבולה ${equationLabel} עם נקודות החיתוך עם הצירים`}
+        aria-label={`גרף הפרבולה ${equationLabel} עם נקודות החיתוך עם הצירים וקודקוד הפרבולה`}
         className="mx-auto mt-2 w-full max-w-sm"
         style={{ direction: "ltr" }}
       >
@@ -130,6 +138,27 @@ export default function QuadraticGraph({ a, b, c, roots, variable }: QuadraticGr
 
         <path d={pathD} fill="none" stroke={CURVE_COLOR} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
+        <line
+          x1={sx(vertexX)}
+          y1={sy(vertexY)}
+          x2={sx(vertexX)}
+          y2={sy(0)}
+          stroke={VERTEX_COLOR}
+          strokeWidth="1"
+          strokeDasharray="3 3"
+        />
+        <circle cx={sx(vertexX)} cy={sy(vertexY)} r="5" fill={VERTEX_COLOR} stroke="#ffffff" strokeWidth="1.5" />
+        <text
+          x={sx(vertexX)}
+          y={sy(vertexY) + (vertexY >= (yMin + yMax) / 2 ? 18 : -10)}
+          fontSize="10"
+          fontWeight="800"
+          fill={VERTEX_COLOR}
+          textAnchor="middle"
+        >
+          קודקוד ({formatNumber(vertexX)}, {formatNumber(vertexY)})
+        </text>
+
         <circle cx={sx(0)} cy={sy(c)} r="4.5" fill={YINT_COLOR} stroke="#ffffff" strokeWidth="1.5" />
         <text x={sx(0) + 8} y={sy(c) - 6} fontSize="9" fontWeight="800" fill={YINT_COLOR}>
           (0, {formatNumber(c)})
@@ -146,7 +175,7 @@ export default function QuadraticGraph({ a, b, c, roots, variable }: QuadraticGr
       </svg>
 
       <p className="mt-2 text-right text-xs font-medium leading-relaxed text-slate-700">
-        הקו הכחול הוא הפרבולה של הפונקציה, הנקודות האדומות הן החיתוך עם ציר ה-X (פתרונות המשוואה) והנקודה הירוקה היא החיתוך עם ציר ה-Y.
+        הקו הכחול הוא הפרבולה של הפונקציה, הנקודות האדומות הן החיתוך עם ציר ה-X (פתרונות המשוואה), הנקודה הירוקה היא החיתוך עם ציר ה-Y, והנקודה הסגולה היא קודקוד הפרבולה.
       </p>
     </div>
   );
