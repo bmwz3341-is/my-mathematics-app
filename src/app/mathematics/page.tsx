@@ -2,15 +2,13 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
 import { ArrowRight, Search, X } from "lucide-react";
-import { mathItems, type MathItem } from "@/config/mathematicsData";
+import { mathItems } from "@/config/mathematicsData";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
 export default function MathematicsPage() {
-  const router = useRouter();
   const [query, setQuery] = useState("");
 
   const filteredItems = useMemo(() => {
@@ -18,12 +16,6 @@ export default function MathematicsPage() {
     if (!q) return mathItems;
     return mathItems.filter((item) => item.label.includes(q));
   }, [query]);
-
-  function handleSelect(item: MathItem) {
-    if (item.href) {
-      router.push(item.href);
-    }
-  }
 
   return (
     <div
@@ -68,19 +60,20 @@ export default function MathematicsPage() {
             aria-label="כלים מתמטיים"
             className="mt-5 flex flex-row-reverse gap-2 overflow-x-auto pb-1"
           >
-            {mathItems.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleSelect(item)}
-                aria-disabled={item.comingSoon ? "true" : "false"}
-                className={`shrink-0 rounded-full border border-white/60 bg-white/30 px-4 py-2 text-sm font-bold text-slate-600 backdrop-blur-xl transition ${
-                  item.comingSoon ? "opacity-60" : "hover:bg-white/50"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
+            {mathItems.map((item) => {
+              const pillClass = `shrink-0 rounded-full border border-white/60 bg-white/30 px-4 py-2 text-sm font-bold text-slate-600 backdrop-blur-xl transition ${
+                item.comingSoon ? "opacity-60" : "hover:bg-white/50"
+              }`;
+              return item.href && !item.comingSoon ? (
+                <Link key={item.id} href={item.href} className={pillClass}>
+                  {item.label}
+                </Link>
+              ) : (
+                <span key={item.id} aria-disabled="true" className={pillClass}>
+                  {item.label}
+                </span>
+              );
+            })}
           </div>
         )}
 
@@ -88,33 +81,39 @@ export default function MathematicsPage() {
           {filteredItems.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">לא נמצאו תוצאות</p>
           ) : (
-            filteredItems.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleSelect(item)}
-                aria-disabled={item.comingSoon ? "true" : "false"}
-                className={`flex w-full items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/35 px-4 py-4 text-right backdrop-blur-xl backdrop-saturate-150 transition ${
-                  item.comingSoon ? "opacity-60" : "hover:bg-white/55"
-                }`}
-              >
-                <span className="flex items-center gap-3">
-                  <span
-                    className={`flex size-9 items-center justify-center rounded-full ${item.color}`}
-                  >
-                    <item.icon className="size-5 text-white" strokeWidth={2} />
+            filteredItems.map((item) => {
+              const cardClass = `flex w-full items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/35 px-4 py-4 text-right backdrop-blur-xl backdrop-saturate-150 transition ${
+                item.comingSoon ? "opacity-60" : "hover:bg-white/55"
+              }`;
+              const cardContent = (
+                <>
+                  <span className="flex items-center gap-3">
+                    <span
+                      className={`flex size-9 items-center justify-center rounded-full ${item.color}`}
+                    >
+                      <item.icon className="size-5 text-white" strokeWidth={2} />
+                    </span>
+                    <span className="text-base font-bold text-slate-800">{item.label}</span>
                   </span>
-                  <span className="text-base font-bold text-slate-800">{item.label}</span>
+                  {item.comingSoon ? (
+                    <span className="rounded-full bg-white/60 px-2 py-1 text-xs font-bold text-slate-500">
+                      בקרוב
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">‹</span>
+                  )}
+                </>
+              );
+              return item.href && !item.comingSoon ? (
+                <Link key={item.id} href={item.href} className={cardClass}>
+                  {cardContent}
+                </Link>
+              ) : (
+                <span key={item.id} aria-disabled="true" className={cardClass}>
+                  {cardContent}
                 </span>
-                {item.comingSoon ? (
-                  <span className="rounded-full bg-white/60 px-2 py-1 text-xs font-bold text-slate-500">
-                    בקרוב
-                  </span>
-                ) : (
-                  <span className="text-slate-400">‹</span>
-                )}
-              </button>
-            ))
+              );
+            })
           )}
         </div>
       </div>
