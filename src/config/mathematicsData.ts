@@ -1,4 +1,4 @@
-import { Calculator, ChartArea, ChartLine, ChartSpline, Crosshair, GitMerge, Logs, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
+import { Calculator, ChartArea, ChartLine, ChartSpline, Crosshair, Dices, GitMerge, Layers3, Logs, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface MathItem {
@@ -75,6 +75,13 @@ export const mathItems: MathItem[] = [
     href: "/mathematics/system-of-equations",
   },
   {
+    id: "systemOf3Equations",
+    label: "מערכת 3 משוואות ב-3 נעלמים",
+    icon: Layers3,
+    color: "bg-violet-600",
+    href: "/mathematics/system-of-3-equations",
+  },
+  {
     id: "integralCalculator",
     label: "חישוב אינטגרלים",
     icon: ChartArea,
@@ -94,5 +101,12 @@ export const mathItems: MathItem[] = [
     icon: ChartSpline,
     color: "bg-amber-500",
     href: "/mathematics/geometric-sequences",
+  },
+  {
+    id: "probabilityStatistics",
+    label: "הסתברות וסטטיסטיקה",
+    icon: Dices,
+    color: "bg-cyan-600",
+    href: "/mathematics/probability-statistics",
   },
 ];

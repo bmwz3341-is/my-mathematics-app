@@ -68,7 +68,7 @@ export default function QuadraticEquationSolver() {
         </div>
       )}
 
-      {result?.type === "result" && (
+      {result?.type === "result" && !result.hasParams && (
         <>
           <div className="mt-5 rounded-xl bg-[#2F6FED] px-4 py-4 text-center text-white shadow-[0_0_18px_rgba(47,111,237,0.5)]">
             {result.roots.length === 0 && <p className="text-lg font-extrabold">אין פתרון ממשי (D &lt; 0)</p>}
@@ -105,6 +105,35 @@ export default function QuadraticEquationSolver() {
           </div>
 
           <QuadraticGraph a={result.a} b={result.b} c={result.c} roots={result.roots} variable={result.variable} />
+        </>
+      )}
+
+      {result?.type === "result" && result.hasParams && (
+        <>
+          <div className="mt-5 rounded-xl bg-[#2F6FED] px-4 py-4 text-center text-white shadow-[0_0_18px_rgba(47,111,237,0.5)]">
+            <p dir="ltr" className="text-lg font-extrabold">
+              {result.rootsExpr}
+            </p>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
+            <p className="text-right text-sm font-extrabold text-black">דרך הפתרון:</p>
+            <ol className="mt-2 space-y-2">
+              {result.steps.map((step, index) => (
+                <li key={index} className="flex flex-row-reverse items-start gap-2">
+                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#2F6FED] text-xs font-bold text-white">
+                    {index + 1}
+                  </span>
+                  <span className="flex flex-col items-end gap-0.5">
+                    <span className="text-right text-xs font-bold text-orange-500">{step.label}</span>
+                    <span dir="ltr" className="font-mono text-base font-bold text-slate-700">
+                      {step.expr}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </>
       )}
     </div>
