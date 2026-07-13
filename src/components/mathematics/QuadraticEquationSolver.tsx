@@ -87,6 +87,9 @@ export default function QuadraticEquationSolver() {
 
           <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
             <p className="text-right text-sm font-extrabold text-black">דרך הפתרון:</p>
+            <p dir="ltr" className="mt-1 text-center font-mono text-sm font-extrabold text-black">
+              ax² + bx + c = 0 &nbsp;⇒&nbsp; x = (-b ± √(b² - 4ac)) / 2a
+            </p>
             <ol className="mt-2 space-y-2">
               {result.steps.map((step, index) => (
                 <li key={index} className="flex flex-row-reverse items-start gap-2">
@@ -118,6 +121,9 @@ export default function QuadraticEquationSolver() {
 
           <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
             <p className="text-right text-sm font-extrabold text-black">דרך הפתרון:</p>
+            <p dir="ltr" className="mt-1 text-center font-mono text-sm font-extrabold text-black">
+              ax² + bx + c = 0 &nbsp;⇒&nbsp; x = (-b ± √(b² - 4ac)) / 2a
+            </p>
             <ol className="mt-2 space-y-2">
               {result.steps.map((step, index) => (
                 <li key={index} className="flex flex-row-reverse items-start gap-2">
