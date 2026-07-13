@@ -2,12 +2,69 @@
  * Complex-number engine (5-unit level): arithmetic on a+bi, conversions
  * between algebraic and trigonometric (cis) form, De Moivre powers and
  * roots, and quadratic equations in z with a negative discriminant.
- * All numeric work is delegated to math.js to avoid rounding mistakes;
- * the step traces here are pedagogical.
+ * Numeric work uses a small self-contained complex-number implementation
+ * (no external dependency); the step traces here are pedagogical.
  */
 
-import { complex, add, subtract, multiply, divide, pow, type Complex } from "mathjs";
 import { detectVariable, parsePolynomial, formatPolynomial, type Term } from "@/lib/derivative";
+
+export interface Complex {
+  re: number;
+  im: number;
+}
+
+/** Parses "3+2i", "-4i", "i", "2-3i", "5" etc. into a Complex. Returns null on invalid input. */
+function parseComplex(raw: string): Complex | null {
+  const s = raw.replace(/\s+/g, "").replace(/-/g, "+-");
+  if (!s) return null;
+  const parts = s.split("+").filter(Boolean);
+  if (parts.length === 0) return null;
+
+  let re = 0;
+  let im = 0;
+  for (const part of parts) {
+    if (part.endsWith("i")) {
+      const coeffStr = part.slice(0, -1);
+      let coeff: number;
+      if (coeffStr === "" || coeffStr === "+") coeff = 1;
+      else if (coeffStr === "-") coeff = -1;
+      else {
+        coeff = Number(coeffStr);
+        if (!Number.isFinite(coeff)) return null;
+      }
+      im += coeff;
+    } else {
+      const val = Number(part);
+      if (!Number.isFinite(val)) return null;
+      re += val;
+    }
+  }
+  return { re, im };
+}
+
+function cAdd(a: Complex, b: Complex): Complex {
+  return { re: a.re + b.re, im: a.im + b.im };
+}
+
+function cSub(a: Complex, b: Complex): Complex {
+  return { re: a.re - b.re, im: a.im - b.im };
+}
+
+function cMul(a: Complex, b: Complex): Complex {
+  return { re: a.re * b.re - a.im * b.im, im: a.re * b.im + a.im * b.re };
+}
+
+function cDiv(a: Complex, b: Complex): Complex {
+  const denom = b.re * b.re + b.im * b.im;
+  return { re: (a.re * b.re + a.im * b.im) / denom, im: (a.im * b.re - a.re * b.im) / denom };
+}
+
+/** Integer power (n is validated to be a positive integer before this is called). */
+function cPow(z: Complex, n: number): Complex {
+  let result: Complex = { re: 1, im: 0 };
+  for (let i = 0; i < n; i++) result = cMul(result, z);
+  return result;
+}
 
 export interface ComplexStep {
   label: string;
@@ -75,15 +132,11 @@ function angleDeg(re: number, im: number): number {
 function parseComplexInput(raw: string, name: string): Complex | { error: string } {
   const trimmed = raw.trim();
   if (!trimmed) return { error: `נא להזין את המספר המרוכב ${name} (למשל 3+2i)` };
-  try {
-    const z = complex(trimmed);
-    if (!Number.isFinite(z.re) || !Number.isFinite(z.im)) {
-      return { error: `הערך של ${name} אינו מספר מרוכב תקין` };
-    }
-    return z;
-  } catch {
+  const z = parseComplex(trimmed);
+  if (!z || !Number.isFinite(z.re) || !Number.isFinite(z.im)) {
     return { error: `לא ניתן לפרש את ${name} — השתמשו בצורה a+bi, למשל 3+2i` };
   }
+  return z;
 }
 
 /** Steps that derive r and θ for z = a+bi; returns { r, theta } (θ in degrees). */
@@ -134,7 +187,7 @@ export function solveArithmetic(z1Raw: string, z2Raw: string, op: ArithmeticOp):
   let result: Complex;
   switch (op) {
     case "add": {
-      result = add(z1, z2);
+      result = cAdd(z1, z2);
       steps.push({
         label: "שלב 2: חיבור החלקים הממשיים והמדומים בנפרד",
         expr: `(a + c) + (b + d)i = (${fmt(a)} + ${fmt(c)}) + (${fmt(b)} + ${fmt(d)})i`,
@@ -142,7 +195,7 @@ export function solveArithmetic(z1Raw: string, z2Raw: string, op: ArithmeticOp):
       break;
     }
     case "sub": {
-      result = subtract(z1, z2);
+      result = cSub(z1, z2);
       steps.push({
         label: "שלב 2: חיסור החלקים הממשיים והמדומים בנפרד",
         expr: `(a - c) + (b - d)i = (${fmt(a)} - ${fmt(c)}) + (${fmt(b)} - ${fmt(d)})i`,
@@ -150,7 +203,7 @@ export function solveArithmetic(z1Raw: string, z2Raw: string, op: ArithmeticOp):
       break;
     }
     case "mul": {
-      result = multiply(z1, z2) as Complex;
+      result = cMul(z1, z2);
       steps.push({
         label: "שלב 2: פתיחת סוגריים לפי חוק הפילוג",
         expr: `(${formatComplex(a, b)})·(${formatComplex(c, d)}) = ${fmt(a * c)} + ${fmt(a * d)}i + ${fmt(b * c)}i + ${fmt(b * d)}i²`,
@@ -163,7 +216,7 @@ export function solveArithmetic(z1Raw: string, z2Raw: string, op: ArithmeticOp):
     }
     case "div": {
       if (c === 0 && d === 0) return { type: "error", message: "לא ניתן לחלק באפס — z₂ חייב להיות שונה מ-0" };
-      result = divide(z1, z2) as Complex;
+      result = cDiv(z1, z2);
       const conj = formatComplex(c, -d);
       const denom = c * c + d * d;
       steps.push({
@@ -300,7 +353,7 @@ export function solvePower(zRaw: string, nRaw: string): ComplexResult {
     expr: `rⁿ = ${fmt(rn)},   n·θ = ${fmtAngle(n * theta)}${Math.abs(n * theta - nTheta) > 1e-9 ? `  ⇒  (הפחתת סיבובים שלמים)  ${fmtAngle(nTheta)}` : ""}`,
   });
 
-  const result = pow(z, n) as Complex;
+  const result = cPow(z, n);
   steps.push({
     label: "שלב 6: חזרה להצגה אלגברית",
     expr: `z^${n} = ${fmt(rn)}·(cos(${fmtAngle(nTheta)}) + i·sin(${fmtAngle(nTheta)})) = ${formatComplex(result.re, result.im)}`,
