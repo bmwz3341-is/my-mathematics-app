@@ -4,6 +4,8 @@ import { useState } from "react";
 import { GitMerge } from "lucide-react";
 import { solveSystem, type SystemMethod, type SystemResult } from "@/lib/systemOfEquations";
 import SystemOfEquationsGraph from "@/components/mathematics/SystemOfEquationsGraph";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 const EXAMPLES: { eq1: string; eq2: string }[] = [
   { eq1: "x + y = 5", eq2: "2x - y = 1" },
@@ -43,11 +45,16 @@ export default function SystemOfEquationsSolver() {
     if (result && result.type !== "error") handleSolve(eq1Input, eq2Input, m);
   }
 
+  const dailyChallengeActive = useDailyChallengeAutoFill("systemOfEquations", (challenge) => {
+    handleExample({ eq1: challenge.equation1, eq2: challenge.equation2 ?? "" });
+  });
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
       <label htmlFor="sys-eq1-input" className="block text-right text-sm font-bold text-slate-600">
         משוואה ראשונה (למשל x + y = 5)
       </label>
+      <DailyChallengeBanner active={dailyChallengeActive} />
       <input
         id="sys-eq1-input"
         type="text"

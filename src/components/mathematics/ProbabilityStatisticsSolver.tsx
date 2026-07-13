@@ -20,7 +20,7 @@ import {
 } from "@/lib/probabilityStatistics";
 import NormalDistributionGraph from "@/components/mathematics/NormalDistributionGraph";
 
-type EngineId = "classical" | "conditional" | "binomial" | "descriptive" | "normal";
+export type EngineId = "classical" | "conditional" | "binomial" | "descriptive" | "normal";
 
 const ENGINES: { id: EngineId; label: string }[] = [
   { id: "classical", label: "הסתברות קלאסית" },
@@ -535,8 +535,12 @@ function NormalEngine() {
 
 /* ------------------------------------------------------------------ */
 
-export default function ProbabilityStatisticsSolver() {
-  const [engine, setEngine] = useState<EngineId>("classical");
+export default function ProbabilityStatisticsSolver({
+  initialEngine = "classical",
+}: {
+  initialEngine?: EngineId;
+}) {
+  const [engine, setEngine] = useState<EngineId>(initialEngine);
 
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">

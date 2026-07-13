@@ -4,47 +4,63 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
-import { ArrowRight, Camera, Search, Shuffle, X } from "lucide-react";
-import { mathItems, type MathItem } from "@/config/mathematicsData";
-import { generateDailyChallenge } from "@/config/challenges";
-import { setPendingChallenge } from "@/lib/dailyChallengeSession";
+import { ArrowRight, Camera, ChartSpline, Search, Shuffle, TrendingUp, X } from "lucide-react";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
-const ALGEBRA_TRACK_IDS = [
-  "scientificCalculator",
-  "simpleCalculator",
-  "logarithmicEquations",
-  "powersAlgebra",
-  "linearEquations",
-  "functionAnalysis",
-  "systemOfEquations",
-  "quadraticEquations",
-  "systemOf3Equations",
+interface TrackCard {
+  id: string;
+  label: string;
+  href: string;
+  badge?: string;
+  icon?: typeof TrendingUp;
+  color: string;
+}
+
+const CARDS: TrackCard[] = [
+  {
+    id: "statistics",
+    label: "סטטיסטיקה",
+    href: "/mathematics/probability-statistics?engine=descriptive",
+    badge: "x̄",
+    color: "bg-purple-500",
+  },
+  {
+    id: "normalDistribution",
+    label: "התפלגות נורמלית",
+    href: "/mathematics/probability-statistics?engine=normal",
+    badge: "𝒩",
+    color: "bg-indigo-600",
+  },
+  {
+    id: "arithmeticSequences",
+    label: "סדרות חשבוניות",
+    href: "/mathematics/arithmetic-sequences",
+    icon: TrendingUp,
+    color: "bg-lime-600",
+  },
+  {
+    id: "geometricSequences",
+    label: "סדרות הנדסיות",
+    href: "/mathematics/geometric-sequences",
+    icon: ChartSpline,
+    color: "bg-amber-500",
+  },
 ];
 
-export default function MathematicsPage() {
+export default function ProbabilitySequencesPage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
-  const algebraItems = useMemo(
-    () =>
-      ALGEBRA_TRACK_IDS.map((id) => mathItems.find((item) => item.id === id)).filter(
-        (item): item is MathItem => Boolean(item),
-      ),
-    [],
-  );
-
-  const filteredItems = useMemo(() => {
+  const filteredCards = useMemo(() => {
     const q = query.trim();
-    if (!q) return algebraItems;
-    return algebraItems.filter((item) => item.label.includes(q));
-  }, [query, algebraItems]);
+    if (!q) return CARDS;
+    return CARDS.filter((card) => card.label.includes(q));
+  }, [query]);
 
   const handleDailyPractice = () => {
-    const challenge = generateDailyChallenge("algebra");
-    setPendingChallenge(challenge);
-    router.push(challenge.href);
+    const pick = CARDS[Math.floor(Math.random() * CARDS.length)];
+    router.push(pick.href);
   };
 
   return (
@@ -61,8 +77,8 @@ export default function MathematicsPage() {
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
           <div className="text-right">
-            <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">מסלול אלגברה</h1>
-            <p className="mt-1 text-sm font-bold text-indigo-400">משוואות, פרמטרים ומערכות</p>
+            <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">מסלול הסתברות וסדרות</h1>
+            <p className="mt-1 text-sm font-bold text-indigo-400">התפלגויות נורמלית וסטטיסטיקה</p>
           </div>
           <Link
             href="/HomePage"
@@ -79,8 +95,8 @@ export default function MathematicsPage() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="בחר את סוג המשוואה שאתה מנסה לפתור:"
-            aria-label="חיפוש כלי מתמטי"
+            placeholder="בחר את הכלי שברצונך להשתמש בו:"
+            aria-label="חיפוש כלי"
             className="w-full rounded-2xl border border-white/60 bg-white/35 py-3 pr-11 pl-11 text-right text-base font-bold text-slate-800 placeholder:font-bold placeholder:text-slate-400 backdrop-blur-xl backdrop-saturate-150 focus:border-white/90 focus:outline-none"
           />
           {query && (
@@ -111,38 +127,24 @@ export default function MathematicsPage() {
           </span>
         </button>
 
-        {!query.trim() && (
-          <h2 className="mt-6 text-right text-base font-extrabold text-slate-900">
-            בחר כלי מתמטי לתרגול
-          </h2>
-        )}
-
         <div className="mt-4 grid grid-cols-2 gap-3">
-          {filteredItems.length === 0 ? (
+          {filteredCards.length === 0 ? (
             <p className="col-span-2 py-6 text-center text-sm text-slate-500">לא נמצאו תוצאות</p>
           ) : (
-            filteredItems.map((item) => {
-              const cardClass = `flex h-28 flex-col items-end justify-between rounded-2xl border border-white/60 bg-white/80 p-3 text-right shadow-sm backdrop-blur-xl backdrop-saturate-150 transition ${
-                item.comingSoon ? "opacity-60" : "hover:bg-white active:brightness-95"
-              }`;
-              const cardContent = (
-                <>
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-indigo-600 text-sm font-extrabold text-white">
-                    {item.badge}
-                  </span>
-                  <span className="text-sm font-bold text-slate-800">{item.label}</span>
-                </>
-              );
-              return item.href && !item.comingSoon ? (
-                <Link key={item.id} href={item.href} className={cardClass}>
-                  {cardContent}
-                </Link>
-              ) : (
-                <span key={item.id} aria-disabled="true" className={cardClass}>
-                  {cardContent}
+            filteredCards.map((card) => (
+              <Link
+                key={card.id}
+                href={card.href}
+                className="flex h-28 flex-col items-end justify-between rounded-2xl border border-white/60 bg-white/80 p-3 text-right shadow-sm backdrop-blur-xl backdrop-saturate-150 transition hover:bg-white active:brightness-95"
+              >
+                <span
+                  className={`flex size-10 items-center justify-center rounded-xl text-sm font-extrabold text-white ${card.color}`}
+                >
+                  {card.icon ? <card.icon className="size-5" strokeWidth={2} /> : card.badge}
                 </span>
-              );
-            })
+                <span className="text-sm font-bold text-slate-800">{card.label}</span>
+              </Link>
+            ))
           )}
         </div>
 

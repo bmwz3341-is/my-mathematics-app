@@ -1,35 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Beaker, Coins, Ruler, Weight } from "lucide-react";
-import {
-  allConversionItemsFlat,
-  type AllConversionItem,
-} from "@/config/allConversionsData";
-import { getRecentConversionIds } from "@/lib/recentConversions";
+import { Camera, ChartColumn, Superscript, Toolbox, Triangle } from "lucide-react";
 import SmartSearchBar from "@/components/shared/SmartSearchBar";
 
-const DEFAULT_RECENT_IDS = ["currency", "length", "weight"];
-
 export default function HomePage() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"conversions" | "math" | "trigo">(
-    "conversions",
-  );
-  const [recentItems, setRecentItems] = useState<AllConversionItem[]>([]);
-
-  useEffect(() => {
-    const recentIds = getRecentConversionIds();
-    const ids = [...recentIds, ...DEFAULT_RECENT_IDS.filter((id) => !recentIds.includes(id))];
-    const items = ids
-      .map((id) => allConversionItemsFlat.find((item) => item.id === id))
-      .filter((item): item is AllConversionItem => Boolean(item))
-      .slice(0, 3);
-    setRecentItems(items);
-  }, []);
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(160deg,#3d4f8f,#4a2f6b_45%,#3a7a8f_100%)] px-6 py-8 sm:px-10">
       <div className="pointer-events-none absolute -left-24 -top-24 size-72 rounded-full bg-white/25 blur-3xl" />
@@ -42,123 +17,56 @@ export default function HomePage() {
         <div className="mt-6">
           <SmartSearchBar />
         </div>
-        <h2 className="mt-8 text-right text-lg font-extrabold text-orange-500">
-          אחרונים
-        </h2>
-        <div className="mt-4 flex flex-row-reverse justify-end gap-4">
-          {recentItems.map((item) => (
-            <Link
-              key={item.id}
-              href={`/AllConversions?item=${item.id}`}
-              aria-label={item.label}
-              className="flex h-24 w-32 flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-3 pt-3 transition hover:brightness-95 active:brightness-90"
-            >
-              <span
-                className={`flex size-9 items-center justify-center rounded-lg shadow-sm ${item.color}`}
-              >
-                <item.icon className="size-5 text-white" strokeWidth={2} />
-              </span>
-              <span className="text-base font-bold text-black">{item.label}</span>
-            </Link>
-          ))}
-        </div>
-        <div className="mt-6 grid grid-cols-3 rounded-xl border-2 border-blue-200 bg-blue-50 p-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab("trigo")}
-            className={`rounded-lg py-2 text-lg font-bold transition ${
-              activeTab === "trigo"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-purple-600"
-            }`}
-          >
-            טריגונומטריה והנדסה
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("math")}
-            className={`rounded-lg py-2 text-lg font-bold transition ${
-              activeTab === "math"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-purple-600"
-            }`}
-          >
-            מתמטיקה
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("conversions")}
-            className={`rounded-lg py-2 text-lg font-bold transition ${
-              activeTab === "conversions"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-purple-600"
-            }`}
-          >
-            המרות
-          </button>
-        </div>
         <div className="mt-6 grid grid-cols-2 gap-4">
-          <Link
-            href="/AllConversions?item=currency"
-            aria-label="מטבעות"
-            className="flex h-36 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
-          >
-            <span className="flex size-12 items-center justify-center rounded-lg shadow-sm bg-cyan-600">
-              <Coins className="size-6 text-white" strokeWidth={2} />
+          <div className="flex h-32 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right">
+            <span className="flex size-10 items-center justify-center rounded-lg shadow-sm bg-green-500">
+              <Triangle className="size-5 text-white" strokeWidth={2} />
             </span>
-            <span className="text-lg font-bold text-black">מטבעות</span>
+            <span className="text-base font-bold text-black">מסלול מרחב וגיאומטריה</span>
+            <span className="text-xs text-gray-500">וקטורים, טריגו ומישורים</span>
+          </div>
+          <Link
+            href="/mathematics"
+            aria-label="מסלול אלגברה"
+            className="flex h-32 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
+          >
+            <span className="flex size-10 items-center justify-center rounded-lg shadow-sm bg-blue-600">
+              <Superscript className="size-5 text-white" strokeWidth={2} />
+            </span>
+            <span className="text-base font-bold text-black">מסלול אלגברה</span>
+            <span className="text-xs text-gray-500">משוואות, פרמטרים ומערכות</span>
           </Link>
           <Link
-            href="/AllConversions?item=length"
-            aria-label="אורך"
-            className="flex h-36 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
+            href="/AllConversions"
+            aria-label="ארגז כלים טכני"
+            className="flex h-32 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
           >
-            <span className="flex size-12 items-center justify-center rounded-lg shadow-sm bg-green-300">
-              <Ruler className="size-6 text-white" strokeWidth={2} />
+            <span className="flex size-10 items-center justify-center rounded-lg shadow-sm bg-teal-500">
+              <Toolbox className="size-5 text-white" strokeWidth={2} />
             </span>
-            <span className="text-lg font-bold text-black">אורך</span>
+            <span className="text-base font-bold text-black">ארגז כלים טכני</span>
+            <span className="text-xs text-gray-500">המרות יחידות, מחשבונים כלליים</span>
           </Link>
           <Link
-            href="/AllConversions?item=weight"
-            aria-label="משקל"
-            className="flex h-36 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
+            href="/probability-sequences"
+            aria-label="מסלול הסתברות וסדרות"
+            className="flex h-32 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
           >
-            <span className="flex size-12 items-center justify-center rounded-lg shadow-sm bg-orange-300">
-              <Weight className="size-6 text-white" strokeWidth={2} />
+            <span className="flex size-10 items-center justify-center rounded-lg shadow-sm bg-purple-500">
+              <ChartColumn className="size-5 text-white" strokeWidth={2} />
             </span>
-            <span className="text-lg font-bold text-black">משקל</span>
-          </Link>
-          <Link
-            href="/AllConversions?item=volume"
-            aria-label="נפח"
-            className="flex h-36 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
-          >
-            <span className="flex size-12 items-center justify-center rounded-lg shadow-sm bg-teal-300">
-              <Beaker className="size-6 text-white" strokeWidth={2} />
-            </span>
-            <span className="text-lg font-bold text-black">נפח</span>
+            <span className="text-base font-bold text-black">מסלול הסתברות וסדרות</span>
+            <span className="text-xs text-gray-500">התפלגויות נורמלית וסטטיסטיקה</span>
           </Link>
         </div>
-        <button
-          type="button"
-          onClick={() =>
-            router.push(
-              activeTab === "conversions"
-                ? "/AllConversions"
-                : activeTab === "math"
-                  ? "/mathematics"
-                  : "/Trigo",
-            )
-          }
-          className="mt-6 w-full rounded-xl bg-blue-50 py-3 text-center text-lg font-bold text-blue-600 transition hover:brightness-95 active:brightness-90"
-        >
-          {activeTab === "conversions"
-            ? "כל ההמרות"
-            : activeTab === "math"
-              ? "מתמטיקה"
-              : "טריגונומטריה והנדסה"}
-          <span className="ms-2 text-blue-800">{">>"}</span>
-        </button>
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-black/70">
+            <Camera className="size-4 text-white" strokeWidth={2} />
+          </span>
+          <p className="text-right text-sm text-white">
+            <span className="font-bold">טיפ:</span> לא בטוח מה לבחור? צלם את התרגיל והמערכת תזהה עבורך.
+          </p>
+        </div>
       </div>
     </div>
   );

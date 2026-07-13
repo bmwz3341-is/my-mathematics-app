@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Sigma } from "lucide-react";
 import { solveMathInput, symLinearToNumeric, type SolveResult } from "@/lib/equationSolver";
 import EquationGraph from "@/components/mathematics/EquationGraph";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 const EXAMPLES = [
   "2x + 3 = 7",
@@ -38,11 +40,16 @@ export default function SolvingEquations() {
     setResult(solveMathInput(example));
   }
 
+  const dailyChallengeActive = useDailyChallengeAutoFill("linearEquations", (challenge) => {
+    handleExample(challenge.equation1);
+  });
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
       <label htmlFor="equation-input" className="block text-right text-sm font-bold text-slate-600">
         הזינו משוואה (למשל 2x + 3 = 7) או ביטוי חשבוני
       </label>
+      <DailyChallengeBanner active={dailyChallengeActive} />
       <input
         id="equation-input"
         type="text"

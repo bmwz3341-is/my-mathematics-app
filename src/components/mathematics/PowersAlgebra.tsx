@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Superscript } from "lucide-react";
 import { solvePowerExpression, type PowerSolveResult } from "@/lib/powerLaws";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 const EXAMPLES = [
   "x^2 * x^3",
@@ -42,11 +44,16 @@ export default function PowersAlgebra() {
     setResult(solvePowerExpression(example));
   }
 
+  const dailyChallengeActive = useDailyChallengeAutoFill("powersAlgebra", (challenge) => {
+    handleExample(challenge.equation1);
+  });
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
       <label htmlFor="power-input" className="block text-right text-sm font-bold text-slate-600">
         הזינו ביטוי חזקות, פולינום, משוואה או שורש (למשל x^2 * x^3, x^2=9 או sqrt(3^X)=9)
       </label>
+      <DailyChallengeBanner active={dailyChallengeActive} />
       <input
         id="power-input"
         type="text"

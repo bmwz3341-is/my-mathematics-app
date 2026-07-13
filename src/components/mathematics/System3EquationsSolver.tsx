@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Layers3 } from "lucide-react";
 import { solveSystem3, type System3Result } from "@/lib/system3Equations";
 import System3EquationsGraph from "@/components/mathematics/System3EquationsGraph";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 const EXAMPLES: { eq1: string; eq2: string; eq3: string }[] = [
   { eq1: "x + y + z = 6", eq2: "2x - y + z = 3", eq3: "x + 2y - z = 2" },
@@ -34,11 +36,20 @@ export default function System3EquationsSolver() {
     handleSolve(example.eq1, example.eq2, example.eq3);
   }
 
+  const dailyChallengeActive = useDailyChallengeAutoFill("systemOf3Equations", (challenge) => {
+    handleExample({
+      eq1: challenge.equation1,
+      eq2: challenge.equation2 ?? "",
+      eq3: challenge.equation3 ?? "",
+    });
+  });
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
       <label htmlFor="sys3-eq1-input" className="block text-right text-sm font-bold text-slate-600">
         משוואה ראשונה (למשל x + y + z = 6)
       </label>
+      <DailyChallengeBanner active={dailyChallengeActive} />
       <input
         id="sys3-eq1-input"
         type="text"

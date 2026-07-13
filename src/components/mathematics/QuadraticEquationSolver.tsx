@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Radical } from "lucide-react";
 import { solveQuadratic, type QuadraticResult } from "@/lib/quadraticSolver";
 import QuadraticGraph from "@/components/mathematics/QuadraticGraph";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 const EXAMPLES = ["x^2 - 5x + 6 = 0", "x^2 + 5x = -6", "x^2 - 4x + 4 = 0", "x^2 + 2x + 5 = 0", "2x^2 - 8 = 0"];
 
@@ -20,11 +22,16 @@ export default function QuadraticEquationSolver() {
     setResult(solveQuadratic(example));
   }
 
+  const dailyChallengeActive = useDailyChallengeAutoFill("quadraticEquations", (challenge) => {
+    handleExample(challenge.equation1);
+  });
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
       <label htmlFor="quadratic-input" className="block text-right text-sm font-bold text-slate-600">
         הזינו משוואה ריבועית (למשל x^2 + 5x = -6)
       </label>
+      <DailyChallengeBanner active={dailyChallengeActive} />
       <input
         id="quadratic-input"
         type="text"

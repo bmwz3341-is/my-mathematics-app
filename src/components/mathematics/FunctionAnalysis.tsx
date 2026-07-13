@@ -5,6 +5,8 @@ import { ChartLine, Crosshair } from "lucide-react";
 import { differentiate, type DerivativeResult } from "@/lib/derivative";
 import { findExtrema, type FunctionAnalysisResult, type CriticalPoint } from "@/lib/functionAnalysis";
 import DerivativeGraph from "@/components/mathematics/DerivativeGraph";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 const EXAMPLES = ["x^3 - 3x^2", "x^3 - 3x + 1", "x^4 - 4x^2", "-x^2 + 4x", "x^3 - 6x^2 + 9x"];
 
@@ -38,11 +40,16 @@ export default function FunctionAnalysis() {
     setAnalysisResult(findExtrema(derivativeResult.originalTerms, derivativeResult.variable));
   }
 
+  const dailyChallengeActive = useDailyChallengeAutoFill("functionAnalysis", (challenge) => {
+    handleExample(challenge.equation1);
+  });
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
       <label htmlFor="analysis-input" className="block text-right text-sm font-bold text-slate-600">
         הזינו פונקציה פולינומית לחקירה (למשל x^3 - 3x^2)
       </label>
+      <DailyChallengeBanner active={dailyChallengeActive} />
       <input
         id="analysis-input"
         type="text"

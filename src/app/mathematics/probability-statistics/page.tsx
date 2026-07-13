@@ -1,13 +1,23 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Heebo } from "next/font/google";
 import { ArrowRight } from "lucide-react";
-import ProbabilityStatisticsSolver from "@/components/mathematics/ProbabilityStatisticsSolver";
+import ProbabilityStatisticsSolver, { type EngineId } from "@/components/mathematics/ProbabilityStatisticsSolver";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
-export default function ProbabilityStatisticsPage() {
+const VALID_ENGINES: EngineId[] = ["classical", "conditional", "binomial", "descriptive", "normal"];
+
+function ProbabilityStatisticsContent() {
+  const searchParams = useSearchParams();
+  const engineParam = searchParams.get("engine");
+  const initialEngine = VALID_ENGINES.includes(engineParam as EngineId)
+    ? (engineParam as EngineId)
+    : undefined;
+
   return (
     <div
       dir="rtl"
@@ -26,17 +36,25 @@ export default function ProbabilityStatisticsPage() {
         </p>
 
         <div className="mt-6">
-          <ProbabilityStatisticsSolver />
+          <ProbabilityStatisticsSolver key={initialEngine ?? "classical"} initialEngine={initialEngine} />
         </div>
       </div>
 
       <Link
-        href="/mathematics"
+        href="/probability-sequences"
         aria-label="חזרה למסך הקודם"
         className="fixed bottom-6 right-6 flex size-14 items-center justify-center rounded-full border border-white/60 bg-white/40 text-[#2F6FED] shadow-[0_0_18px_rgba(47,111,237,0.4)] backdrop-blur-xl backdrop-saturate-150 transition hover:bg-white/60 active:scale-95"
       >
         <ArrowRight className="size-6" strokeWidth={2.5} />
       </Link>
     </div>
+  );
+}
+
+export default function ProbabilityStatisticsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProbabilityStatisticsContent />
+    </Suspense>
   );
 }

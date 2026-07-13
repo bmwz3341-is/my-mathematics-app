@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Logs } from "lucide-react";
 import { solveLogarithmicEquation, type LogSolveResult } from "@/lib/logarithmEquations";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 const EXAMPLES = [
   "log_2(x+3) + log_2(x-3) = 4",
@@ -36,11 +38,16 @@ export default function LogarithmicEquations() {
     setResult(solveLogarithmicEquation(example));
   }
 
+  const dailyChallengeActive = useDailyChallengeAutoFill("logarithmicEquations", (challenge) => {
+    handleExample(challenge.equation1);
+  });
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
       <label htmlFor="log-input" className="block text-right text-sm font-bold text-slate-600">
         הזינו משוואה לוגריתמית (log_2(x+3)+log_2(x-3)=4) או ביטוי בודד ללא סימן = (log(x-3))
       </label>
+      <DailyChallengeBanner active={dailyChallengeActive} />
       <input
         id="log-input"
         type="text"

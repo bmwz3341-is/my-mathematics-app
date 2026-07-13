@@ -6,6 +6,7 @@ export interface MathItem {
   label: string;
   icon: LucideIcon;
   color: string;
+  badge?: string;
   href?: string;
   comingSoon?: boolean;
 }
@@ -16,27 +17,31 @@ export const mathItems: MathItem[] = [
     label: "מחשבון פשוט",
     icon: Calculator,
     color: "bg-blue-500",
+    badge: "123",
     href: "/mathematics/simple-calculator",
   },
   {
     id: "scientificCalculator",
-    label: "מחשבון מדעי מקצועי",
+    label: "מחשבון מדעי",
     icon: SquareFunction,
     color: "bg-purple-500",
+    badge: "sin",
     href: "/mathematics/scientific-calculator",
   },
   {
     id: "powersAlgebra",
-    label: "חזקות ומשוואות מעריכיות",
+    label: "חזקות ושורשים",
     icon: Superscript,
     color: "bg-emerald-500",
+    badge: "xⁿ",
     href: "/mathematics/exponents-algebra",
   },
   {
     id: "logarithmicEquations",
-    label: "משוואות לוגריתמיות",
+    label: "לוגריתמים",
     icon: Logs,
     color: "bg-teal-500",
+    badge: "log",
     href: "/mathematics/logarithmic-equations",
   },
   {
@@ -48,9 +53,10 @@ export const mathItems: MathItem[] = [
   },
   {
     id: "functionAnalysis",
-    label: "חקירת פונקציות",
+    label: "גרפים וחקירת פונקציות",
     icon: Crosshair,
     color: "bg-red-500",
+    badge: "f(x)",
     href: "/mathematics/function-analysis",
   },
   {
@@ -58,6 +64,7 @@ export const mathItems: MathItem[] = [
     label: "משוואות לינאריות",
     icon: Sigma,
     color: "bg-orange-500",
+    badge: "y=x",
     href: "/mathematics/linear-equations",
   },
   {
@@ -65,20 +72,23 @@ export const mathItems: MathItem[] = [
     label: "משוואות ריבועיות",
     icon: Radical,
     color: "bg-indigo-500",
+    badge: "x²",
     href: "/mathematics/quadratic-equations",
   },
   {
     id: "systemOfEquations",
-    label: "מערכת משוואות ב-2 נעלמים",
+    label: "מערכת 2 נעלמים",
     icon: GitMerge,
     color: "bg-sky-500",
+    badge: "x,y",
     href: "/mathematics/system-of-equations",
   },
   {
     id: "systemOf3Equations",
-    label: "מערכת 3 משוואות ב-3 נעלמים",
+    label: "מערכת 3 נעלמים",
     icon: Layers3,
     color: "bg-violet-600",
+    badge: "x,y,z",
     href: "/mathematics/system-of-3-equations",
   },
   {
