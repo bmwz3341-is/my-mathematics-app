@@ -18,13 +18,17 @@ export default function HomePage() {
           <SmartSearchBar />
         </div>
         <div className="mt-6 grid grid-cols-2 gap-4">
-          <div className="flex h-32 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right">
+          <Link
+            href="/space-geometry"
+            aria-label="מסלול מרחב וגיאומטריה"
+            className="flex h-32 w-full flex-col items-start justify-start gap-2 rounded-xl border-2 border-blue-200 bg-blue-50 px-4 pt-4 text-right transition hover:brightness-95 active:brightness-90"
+          >
             <span className="flex size-10 items-center justify-center rounded-lg shadow-sm bg-green-500">
               <Triangle className="size-5 text-white" strokeWidth={2} />
             </span>
             <span className="text-base font-bold text-black">מסלול מרחב וגיאומטריה</span>
             <span className="text-xs text-gray-500">וקטורים, טריגו ומישורים</span>
-          </div>
+          </Link>
           <Link
             href="/mathematics"
             aria-label="מסלול אלגברה"
