@@ -39,7 +39,7 @@ export default function LogarithmicEquations() {
   }
 
   const dailyChallengeActive = useDailyChallengeAutoFill("logarithmicEquations", (challenge) => {
-    handleExample(challenge.equation1);
+    handleExample(challenge.equation1 ?? "");
   });
 
   return (

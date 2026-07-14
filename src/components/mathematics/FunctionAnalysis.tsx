@@ -41,7 +41,7 @@ export default function FunctionAnalysis() {
   }
 
   const dailyChallengeActive = useDailyChallengeAutoFill("functionAnalysis", (challenge) => {
-    handleExample(challenge.equation1);
+    handleExample(challenge.equation1 ?? "");
   });
 
   return (

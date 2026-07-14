@@ -38,7 +38,7 @@ export default function System3EquationsSolver() {
 
   const dailyChallengeActive = useDailyChallengeAutoFill("systemOf3Equations", (challenge) => {
     handleExample({
-      eq1: challenge.equation1,
+      eq1: challenge.equation1 ?? "",
       eq2: challenge.equation2 ?? "",
       eq3: challenge.equation3 ?? "",
     });

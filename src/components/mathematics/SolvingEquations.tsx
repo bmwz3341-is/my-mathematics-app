@@ -41,7 +41,7 @@ export default function SolvingEquations() {
   }
 
   const dailyChallengeActive = useDailyChallengeAutoFill("linearEquations", (challenge) => {
-    handleExample(challenge.equation1);
+    handleExample(challenge.equation1 ?? "");
   });
 
   return (

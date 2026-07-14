@@ -9,6 +9,7 @@ import {
   type GeoSequenceResult,
 } from "@/lib/geometricSequence";
 import SequenceTermsGraph from "@/components/mathematics/SequenceTermsGraph";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 interface FieldDef {
   key: keyof GeoSequenceInput;
@@ -48,6 +49,12 @@ export default function GeometricSequenceSolver() {
   const [form, setForm] = useState<Record<keyof GeoSequenceInput, string>>(EMPTY_FORM);
   const [findN, setFindN] = useState("");
   const [result, setResult] = useState<GeoSequenceResult | null>(null);
+
+  useDailyChallengeAutoFill("geometricSequences", (challenge) => {
+    const values = { ...EMPTY_FORM, ...(challenge.params ?? {}) } as Record<keyof GeoSequenceInput, string>;
+    setForm(values);
+    solveWith(values);
+  });
 
   function buildInput(values: Record<keyof GeoSequenceInput, string>): GeoSequenceInput | { error: string } {
     const input: GeoSequenceInput = {};

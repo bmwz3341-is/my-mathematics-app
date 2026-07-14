@@ -45,7 +45,7 @@ export default function PowersAlgebra() {
   }
 
   const dailyChallengeActive = useDailyChallengeAutoFill("powersAlgebra", (challenge) => {
-    handleExample(challenge.equation1);
+    handleExample(challenge.equation1 ?? "");
   });
 
   return (

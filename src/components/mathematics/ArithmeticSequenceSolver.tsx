@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TrendingUp } from "lucide-react";
 import { kindLabel, solveSequence, type SequenceInput, type SequenceResult } from "@/lib/arithmeticSequence";
 import SequenceTermsGraph from "@/components/mathematics/SequenceTermsGraph";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
 
 interface FieldDef {
   key: keyof SequenceInput;
@@ -43,6 +44,12 @@ export default function ArithmeticSequenceSolver() {
   const [form, setForm] = useState<Record<keyof SequenceInput, string>>(EMPTY_FORM);
   const [findN, setFindN] = useState("");
   const [result, setResult] = useState<SequenceResult | null>(null);
+
+  useDailyChallengeAutoFill("arithmeticSequences", (challenge) => {
+    const values = { ...EMPTY_FORM, ...(challenge.params ?? {}) } as Record<keyof SequenceInput, string>;
+    setForm(values);
+    solveWith(values);
+  });
 
   function buildInput(values: Record<keyof SequenceInput, string>): SequenceInput | { error: string } {
     const input: SequenceInput = {};

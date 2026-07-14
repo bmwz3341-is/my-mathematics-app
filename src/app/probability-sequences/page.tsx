@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
 import { ArrowRight, Camera, ChartSpline, Search, Shuffle, TrendingUp, X } from "lucide-react";
+import { generateDailyChallenge } from "@/config/challenges";
+import { setPendingChallenge } from "@/lib/dailyChallengeSession";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
@@ -59,8 +61,9 @@ export default function ProbabilitySequencesPage() {
   }, [query]);
 
   const handleDailyPractice = () => {
-    const pick = CARDS[Math.floor(Math.random() * CARDS.length)];
-    router.push(pick.href);
+    const challenge = generateDailyChallenge("probabilitySequences");
+    setPendingChallenge(challenge);
+    router.push(challenge.href);
   };
 
   return (

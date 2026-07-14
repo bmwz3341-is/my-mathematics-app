@@ -23,7 +23,7 @@ export default function QuadraticEquationSolver() {
   }
 
   const dailyChallengeActive = useDailyChallengeAutoFill("quadraticEquations", (challenge) => {
-    handleExample(challenge.equation1);
+    handleExample(challenge.equation1 ?? "");
   });
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dices } from "lucide-react";
 import {
   formatNumber,
@@ -19,6 +19,8 @@ import {
   type NormalMode,
 } from "@/lib/probabilityStatistics";
 import NormalDistributionGraph from "@/components/mathematics/NormalDistributionGraph";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import type { Challenge } from "@/config/challenges";
 
 export type EngineId = "classical" | "conditional" | "binomial" | "descriptive" | "normal";
 
@@ -119,20 +121,29 @@ function NumField({
 
 /* ------------------------------------------------------------------ */
 
-function ClassicalEngine() {
+function ClassicalEngine({ autofill }: { autofill?: Challenge | null }) {
   const [favorable, setFavorable] = useState("");
   const [total, setTotal] = useState("");
   const [result, setResult] = useState<ClassicalProbabilityOutcome | null>(null);
 
-  function handleSolve() {
-    const f = parseFloat(favorable);
-    const t = parseFloat(total);
+  function handleSolve(values?: { favorable: string; total: string }) {
+    const f = parseFloat(values?.favorable ?? favorable);
+    const t = parseFloat(values?.total ?? total);
     if (!Number.isFinite(f) || !Number.isFinite(t)) {
       setResult({ type: "error", message: "נא להזין ערכים מספריים בשני השדות" });
       return;
     }
     setResult(solveClassicalProbability(f, t));
   }
+
+  useEffect(() => {
+    if (!autofill?.params) return;
+    const { favorable: f, total: t } = autofill.params;
+    setFavorable(f ?? "");
+    setTotal(t ?? "");
+    handleSolve({ favorable: f ?? "", total: t ?? "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autofill]);
 
   return (
     <>
@@ -163,15 +174,20 @@ function ClassicalEngine() {
 
 /* ------------------------------------------------------------------ */
 
-function ConditionalEngine() {
+function ConditionalEngine({ autofill }: { autofill?: Challenge | null }) {
   const [pAB, setPAB] = useState("");
   const [pAnotB, setPAnotB] = useState("");
   const [pnotAB, setPnotAB] = useState("");
   const [pnotAnotB, setPnotAnotB] = useState("");
   const [result, setResult] = useState<ConditionalProbabilityOutcome | null>(null);
 
-  function handleSolve() {
-    const vals = [pAB, pAnotB, pnotAB, pnotAnotB].map((v) => parseFloat(v));
+  function handleSolve(values?: { pAB: string; pAnotB: string; pnotAB: string; pnotAnotB: string }) {
+    const vals = [
+      values?.pAB ?? pAB,
+      values?.pAnotB ?? pAnotB,
+      values?.pnotAB ?? pnotAB,
+      values?.pnotAnotB ?? pnotAnotB,
+    ].map((v) => parseFloat(v));
     if (vals.some((v) => !Number.isFinite(v))) {
       setResult({ type: "error", message: "נא למלא את כל ארבעת תאי הטבלה בערכים מספריים" });
       return;
@@ -185,6 +201,17 @@ function ConditionalEngine() {
       }),
     );
   }
+
+  useEffect(() => {
+    if (!autofill?.params) return;
+    const { pAB: a, pAnotB: b, pnotAB: c, pnotAnotB: d } = autofill.params;
+    setPAB(a ?? "");
+    setPAnotB(b ?? "");
+    setPnotAB(c ?? "");
+    setPnotAnotB(d ?? "");
+    handleSolve({ pAB: a ?? "", pAnotB: b ?? "", pnotAB: c ?? "", pnotAnotB: d ?? "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autofill]);
 
   return (
     <>
@@ -276,22 +303,32 @@ function ConditionalEngine() {
 
 /* ------------------------------------------------------------------ */
 
-function BinomialEngine() {
+function BinomialEngine({ autofill }: { autofill?: Challenge | null }) {
   const [n, setN] = useState("");
   const [k, setK] = useState("");
   const [p, setP] = useState("");
   const [result, setResult] = useState<BinomialOutcome | null>(null);
 
-  function handleSolve() {
-    const nn = parseFloat(n);
-    const kk = parseFloat(k);
-    const pp = parseFloat(p);
+  function handleSolve(values?: { n: string; k: string; p: string }) {
+    const nn = parseFloat(values?.n ?? n);
+    const kk = parseFloat(values?.k ?? k);
+    const pp = parseFloat(values?.p ?? p);
     if (![nn, kk, pp].every((v) => Number.isFinite(v))) {
       setResult({ type: "error", message: "נא להזין ערכים מספריים בכל השדות (n, k, p)" });
       return;
     }
     setResult(solveBinomial(nn, kk, pp));
   }
+
+  useEffect(() => {
+    if (!autofill?.params) return;
+    const { n: nv, k: kv, p: pv } = autofill.params;
+    setN(nv ?? "");
+    setK(kv ?? "");
+    setP(pv ?? "");
+    handleSolve({ n: nv ?? "", k: kv ?? "", p: pv ?? "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autofill]);
 
   return (
     <>
@@ -326,23 +363,26 @@ function BinomialEngine() {
 
 /* ------------------------------------------------------------------ */
 
-function DescriptiveEngine() {
+function DescriptiveEngine({ autofill }: { autofill?: Challenge | null }) {
   const [mode, setMode] = useState<"list" | "freq">("list");
   const [listText, setListText] = useState("");
   const [freqText, setFreqText] = useState("");
   const [result, setResult] = useState<DescriptiveStatsOutcome | null>(null);
 
-  function handleSolve() {
-    if (mode === "list") {
-      const raw = listText.split(",").map((s) => s.trim()).filter((s) => s !== "");
-      const values = raw.map((s) => parseFloat(s));
-      if (values.length === 0 || values.some((v) => !Number.isFinite(v))) {
+  function handleSolve(values?: { mode: "list" | "freq"; listText: string; freqText: string }) {
+    const m = values?.mode ?? mode;
+    const list = values?.listText ?? listText;
+    const freq = values?.freqText ?? freqText;
+    if (m === "list") {
+      const raw = list.split(",").map((s) => s.trim()).filter((s) => s !== "");
+      const values2 = raw.map((s) => parseFloat(s));
+      if (values2.length === 0 || values2.some((v) => !Number.isFinite(v))) {
         setResult({ type: "error", message: "נא להזין רשימת מספרים מופרדים בפסיקים, לדוגמה: 4, 7, 7, 9, 12" });
         return;
       }
-      setResult(solveDescriptiveStats({ mode: "list", values }));
+      setResult(solveDescriptiveStats({ mode: "list", values: values2 }));
     } else {
-      const rows = freqText.split(",").map((s) => s.trim()).filter((s) => s !== "");
+      const rows = freq.split(",").map((s) => s.trim()).filter((s) => s !== "");
       const pairs: FrequencyPair[] = [];
       for (const row of rows) {
         const parts = row.split(":").map((s) => s.trim());
@@ -365,6 +405,18 @@ function DescriptiveEngine() {
       setResult(solveDescriptiveStats({ mode: "freq", pairs }));
     }
   }
+
+  useEffect(() => {
+    if (!autofill?.params) return;
+    const m = (autofill.params.mode as "list" | "freq") ?? "list";
+    const list = autofill.params.listText ?? "";
+    const freq = autofill.params.freqText ?? "";
+    setMode(m);
+    setListText(list);
+    setFreqText(freq);
+    handleSolve({ mode: m, listText: list, freqText: freq });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autofill]);
 
   return (
     <>
@@ -453,7 +505,7 @@ const NORMAL_MODES: { id: NormalMode; label: string }[] = [
   { id: "between", label: "P(a < X < b)" },
 ];
 
-function NormalEngine() {
+function NormalEngine({ autofill }: { autofill?: Challenge | null }) {
   const [mu, setMu] = useState("");
   const [sigma, setSigma] = useState("");
   const [mode, setMode] = useState<NormalMode>("below");
@@ -461,24 +513,42 @@ function NormalEngine() {
   const [x2, setX2] = useState("");
   const [result, setResult] = useState<NormalDistributionOutcome | null>(null);
 
-  function handleSolve() {
-    const muVal = parseFloat(mu);
-    const sigmaVal = parseFloat(sigma);
-    const xVal = parseFloat(x);
+  function handleSolve(values?: { mu: string; sigma: string; mode: NormalMode; x: string; x2: string }) {
+    const muRaw = values?.mu ?? mu;
+    const sigmaRaw = values?.sigma ?? sigma;
+    const modeVal = values?.mode ?? mode;
+    const xRaw = values?.x ?? x;
+    const x2Raw = values?.x2 ?? x2;
+    const muVal = parseFloat(muRaw);
+    const sigmaVal = parseFloat(sigmaRaw);
+    const xVal = parseFloat(xRaw);
     if (![muVal, sigmaVal, xVal].every((v) => Number.isFinite(v))) {
       setResult({ type: "error", message: "נא להזין ערכים מספריים ל-μ, σ ו-X" });
       return;
     }
     let x2Val: number | undefined;
-    if (mode === "between") {
-      x2Val = parseFloat(x2);
+    if (modeVal === "between") {
+      x2Val = parseFloat(x2Raw);
       if (!Number.isFinite(x2Val)) {
         setResult({ type: "error", message: "נא להזין גם ערך X2 תקין עבור טווח בין שני ערכים" });
         return;
       }
     }
-    setResult(solveNormalDistribution({ mu: muVal, sigma: sigmaVal, mode, x: xVal, x2: x2Val }));
+    setResult(solveNormalDistribution({ mu: muVal, sigma: sigmaVal, mode: modeVal, x: xVal, x2: x2Val }));
   }
+
+  useEffect(() => {
+    if (!autofill?.params) return;
+    const { mu: muP, sigma: sigmaP, mode: modeP, x: xP, x2: x2P } = autofill.params;
+    const modeVal = (modeP as NormalMode) ?? "below";
+    setMu(muP ?? "");
+    setSigma(sigmaP ?? "");
+    setMode(modeVal);
+    setX(xP ?? "");
+    setX2(x2P ?? "");
+    handleSolve({ mu: muP ?? "", sigma: sigmaP ?? "", mode: modeVal, x: xP ?? "", x2: x2P ?? "" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autofill]);
 
   return (
     <>
@@ -541,6 +611,13 @@ export default function ProbabilityStatisticsSolver({
   initialEngine?: EngineId;
 }) {
   const [engine, setEngine] = useState<EngineId>(initialEngine);
+  const [autofill, setAutofill] = useState<Challenge | null>(null);
+
+  useDailyChallengeAutoFill("probabilityStatistics", (challenge) => {
+    const eng = (challenge.engine as EngineId) ?? "classical";
+    setEngine(eng);
+    setAutofill(challenge);
+  });
 
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
@@ -558,11 +635,11 @@ export default function ProbabilityStatisticsSolver({
       </div>
 
       <div className="mt-4">
-        {engine === "classical" && <ClassicalEngine />}
-        {engine === "conditional" && <ConditionalEngine />}
-        {engine === "binomial" && <BinomialEngine />}
-        {engine === "descriptive" && <DescriptiveEngine />}
-        {engine === "normal" && <NormalEngine />}
+        {engine === "classical" && <ClassicalEngine autofill={engine === "classical" ? autofill : null} />}
+        {engine === "conditional" && <ConditionalEngine autofill={engine === "conditional" ? autofill : null} />}
+        {engine === "binomial" && <BinomialEngine autofill={engine === "binomial" ? autofill : null} />}
+        {engine === "descriptive" && <DescriptiveEngine autofill={engine === "descriptive" ? autofill : null} />}
+        {engine === "normal" && <NormalEngine autofill={engine === "normal" ? autofill : null} />}
       </div>
     </div>
   );

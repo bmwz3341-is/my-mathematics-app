@@ -46,7 +46,7 @@ export default function SystemOfEquationsSolver() {
   }
 
   const dailyChallengeActive = useDailyChallengeAutoFill("systemOfEquations", (challenge) => {
-    handleExample({ eq1: challenge.equation1, eq2: challenge.equation2 ?? "" });
+    handleExample({ eq1: challenge.equation1 ?? "", eq2: challenge.equation2 ?? "" });
   });
 
   return (
