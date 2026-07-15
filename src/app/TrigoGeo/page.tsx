@@ -4,45 +4,57 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
-import { ArrowRight, ArrowRightLeft, Camera, Search, Shuffle, X } from "lucide-react";
+import {
+  ArrowRight,
+  Camera,
+  Search,
+  Shuffle,
+  X,
+  Triangle,
+  Compass,
+  Ruler,
+  Equal,
+  SquareFunction,
+  CircleDot,
+  ArrowRightLeft,
+  Box,
+  Layers,
+} from "lucide-react";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
-interface TrackCard {
+interface TopicCard {
   id: string;
   label: string;
   href: string;
-  badge?: string;
-  icon?: typeof ArrowRightLeft;
+  icon: typeof Triangle;
+  badge: string;
 }
 
-const CARDS: TrackCard[] = [
-  {
-    id: "trigonometry",
-    label: "טריגונומטריה",
-    href: "/TrigoGeo",
-    badge: "sin∆",
-  },
-  {
-    id: "vectors3d",
-    label: "וקטורים ותלת-מימד",
-    href: "/mathematics/complex-numbers",
-    icon: ArrowRightLeft,
-  },
+const TRIGOGEO_CARDS: TopicCard[] = [
+  { id: "lawOfSines", label: "משפט הסינוסים", href: "/mathematics/trig-rules?law=sines", icon: Triangle, badge: "sin" },
+  { id: "lawOfCosines", label: "משפט הקוסינוסים", href: "/mathematics/trig-rules?law=cosines", icon: Compass, badge: "cos" },
+  { id: "triangleArea", label: "שטח משולש (½ab·sinC)", href: "/mathematics/triangle-area", icon: Ruler, badge: "S" },
+  { id: "trigIdentities", label: "זהויות טריגונומטריות", href: "/mathematics/trig-identities", icon: Equal, badge: "≡" },
+  { id: "trigEquations", label: "משוואות טריגונומטריות", href: "/mathematics/trig-equations", icon: SquareFunction, badge: "=0" },
+  { id: "unitCircleRadians", label: "מעגל היחידה ורדיאנים", href: "/mathematics/unit-circle-radians", icon: CircleDot, badge: "rad" },
+  { id: "algebraicVectors", label: "וקטורים אלגבריים", href: "/mathematics/algebraic-vectors", icon: ArrowRightLeft, badge: "Vec" },
+  { id: "spaceGeometry3D", label: "גיאומטריה של המרחב", href: "/mathematics/geometry-3d", icon: Box, badge: "3D" },
+  { id: "planeLineEquation", label: "משוואת מישור וישר", href: "/mathematics/plane-and-line-equations", icon: Layers, badge: "Plane" },
 ];
 
-export default function SpaceGeometryPage() {
+export default function TrigoGeoPage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
 
   const filteredCards = useMemo(() => {
     const q = query.trim();
-    if (!q) return CARDS;
-    return CARDS.filter((card) => card.label.includes(q));
+    if (!q) return TRIGOGEO_CARDS;
+    return TRIGOGEO_CARDS.filter((card) => card.label.includes(q));
   }, [query]);
 
   const handleDailyPractice = () => {
-    const pick = CARDS[Math.floor(Math.random() * CARDS.length)];
+    const pick = TRIGOGEO_CARDS[Math.floor(Math.random() * TRIGOGEO_CARDS.length)];
     router.push(pick.href);
   };
 
@@ -60,11 +72,11 @@ export default function SpaceGeometryPage() {
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
           <div className="text-right">
-            <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">מסלול מרחב וגיאומטריה</h1>
-            <p className="mt-1 text-sm font-bold text-black">וקטורים, טריגו ומישורים</p>
+            <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">טריגונומטריה והנדסה</h1>
+            <p className="mt-1 text-sm font-bold text-black">פתרון תרגילים — 9 נושאים ל-5 יחידות</p>
           </div>
           <Link
-            href="/HomePage"
+            href="/space-geometry"
             aria-label="חזרה למסך הקודם"
             className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white shadow-sm transition hover:brightness-95 active:brightness-90"
           >
@@ -78,8 +90,8 @@ export default function SpaceGeometryPage() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="בחר את הכלי שברצונך להשתמש בו:"
-            aria-label="חיפוש כלי"
+            placeholder="בחר את הנושא שברצונך לתרגל:"
+            aria-label="חיפוש נושא"
             className="w-full rounded-2xl border border-white/60 bg-white/35 py-3 pr-11 pl-11 text-right text-base font-bold text-slate-800 placeholder:font-bold placeholder:text-slate-400 backdrop-blur-xl backdrop-saturate-150 focus:border-white/90 focus:outline-none"
           />
           {query && (
@@ -97,7 +109,7 @@ export default function SpaceGeometryPage() {
         <button
           type="button"
           onClick={handleDailyPractice}
-          className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl bg-emerald-600 px-5 py-4 text-right shadow-sm transition hover:brightness-105 active:brightness-95"
+          className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl bg-sky-600 px-5 py-4 text-right shadow-sm transition hover:brightness-105 active:brightness-95"
         >
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/20">
             <Shuffle className="size-5 text-white" strokeWidth={2} />
@@ -105,7 +117,7 @@ export default function SpaceGeometryPage() {
           <span className="flex-1">
             <span className="block text-base font-extrabold text-white">תרגול יומי</span>
             <span className="block text-xs font-medium text-white/80">
-              המערכת בוחרת עבורך תרגיל אקראי מהמסלול
+              המערכת בוחרת עבורך נושא אקראי מהמסלול
             </span>
           </span>
         </button>
@@ -120,8 +132,8 @@ export default function SpaceGeometryPage() {
                 href={card.href}
                 className="flex h-28 flex-col items-end justify-between rounded-2xl border border-white/60 bg-white/80 p-3 text-right shadow-sm backdrop-blur-xl backdrop-saturate-150 transition hover:bg-white active:brightness-95"
               >
-                <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-600 text-sm font-extrabold text-white">
-                  {card.icon ? <card.icon className="size-5" strokeWidth={2} /> : card.badge}
+                <span className="flex size-10 items-center justify-center rounded-xl bg-sky-600 text-sm font-extrabold text-white">
+                  <card.icon className="size-5" strokeWidth={2} />
                 </span>
                 <span className="text-sm font-bold text-slate-800">{card.label}</span>
               </Link>

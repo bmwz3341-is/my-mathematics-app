@@ -17,10 +17,11 @@ export default function IntegralCalculator() {
   const [input, setInput] = useState("");
   const [aInput, setAInput] = useState("0");
   const [bInput, setBInput] = useState("2");
+  const [targetInput, setTargetInput] = useState("");
   const [result, setResult] = useState<IntegralResult | null>(null);
 
   function solve(fn: string, m: IntegralMode) {
-    setResult(integrate(fn, m, aInput, bInput));
+    setResult(integrate(fn, m, aInput, bInput, targetInput));
   }
 
   function handleSolve() {
@@ -82,42 +83,63 @@ export default function IntegralCalculator() {
       />
 
       {mode === "definite" && (
-        <div className="mt-3 flex flex-row-reverse gap-3">
-          <div className="flex-1">
-            <label htmlFor="integral-a" className="block text-right text-xs font-bold text-slate-600">
-              גבול תחתון (a)
+        <>
+          <div className="mt-3 flex flex-row-reverse gap-3">
+            <div className="flex-1">
+              <label htmlFor="integral-a" className="block text-right text-xs font-bold text-slate-600">
+                גבול תחתון (a) — מספר או ביטוי בפרמטר, למשל 2a
+              </label>
+              <input
+                id="integral-a"
+                type="text"
+                dir="ltr"
+                value={aInput}
+                onChange={(e) => setAInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSolve();
+                }}
+                aria-label="גבול תחתון a"
+                className="mt-1 w-full rounded-xl border border-white/60 bg-white/50 px-3 py-2 text-left font-bold text-slate-800 focus:border-[#2F6FED] focus:outline-none"
+              />
+            </div>
+            <div className="flex-1">
+              <label htmlFor="integral-b" className="block text-right text-xs font-bold text-slate-600">
+                גבול עליון (b) — מספר או ביטוי בפרמטר, למשל 3a
+              </label>
+              <input
+                id="integral-b"
+                type="text"
+                dir="ltr"
+                value={bInput}
+                onChange={(e) => setBInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSolve();
+                }}
+                aria-label="גבול עליון b"
+                className="mt-1 w-full rounded-xl border border-white/60 bg-white/50 px-3 py-2 text-left font-bold text-slate-800 focus:border-[#2F6FED] focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <label htmlFor="integral-target" className="block text-right text-xs font-bold text-slate-600">
+              ערך יעד (אופציונלי) — לפתרון עבור הפרמטר כאשר הגבולות מכילים אות (כגון a)
             </label>
             <input
-              id="integral-a"
+              id="integral-target"
               type="text"
               dir="ltr"
-              value={aInput}
-              onChange={(e) => setAInput(e.target.value)}
+              value={targetInput}
+              onChange={(e) => setTargetInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSolve();
               }}
-              aria-label="גבול תחתון a"
-              className="mt-1 w-full rounded-xl border border-white/60 bg-white/50 px-3 py-2 text-left font-bold text-slate-800 focus:border-[#2F6FED] focus:outline-none"
+              placeholder="7.5"
+              aria-label="ערך יעד לפתרון עבור הפרמטר"
+              className="mt-1 w-full rounded-xl border border-white/60 bg-white/50 px-3 py-2 text-left font-bold text-slate-800 placeholder:font-medium placeholder:text-slate-400 focus:border-[#2F6FED] focus:outline-none"
             />
           </div>
-          <div className="flex-1">
-            <label htmlFor="integral-b" className="block text-right text-xs font-bold text-slate-600">
-              גבול עליון (b)
-            </label>
-            <input
-              id="integral-b"
-              type="text"
-              dir="ltr"
-              value={bInput}
-              onChange={(e) => setBInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSolve();
-              }}
-              aria-label="גבול עליון b"
-              className="mt-1 w-full rounded-xl border border-white/60 bg-white/50 px-3 py-2 text-left font-bold text-slate-800 focus:border-[#2F6FED] focus:outline-none"
-            />
-          </div>
-        </div>
+        </>
       )}
 
       <button
@@ -164,6 +186,26 @@ export default function IntegralCalculator() {
                 <p dir="ltr" className="mt-1 text-2xl font-extrabold">
                   ∫f({result.variable})d{result.variable} = {result.antiderivativeExpr}
                 </p>
+              </>
+            ) : result.parametric ? (
+              <>
+                <p className="text-sm font-bold leading-relaxed">
+                  האינטגרל המסוים של{" "}
+                  <bdi dir="ltr" className="font-mono">
+                    f({result.variable}) = {result.originalExpr}
+                  </bdi>{" "}
+                  בין {result.parametric.aExpr} ל-{result.parametric.bExpr} הוא
+                </p>
+                <p dir="ltr" className="mt-1 text-2xl font-extrabold">
+                  ∫[{result.parametric.aExpr}, {result.parametric.bExpr}] f({result.variable})d{result.variable} = {result.parametric.definiteExpr}
+                </p>
+                {result.parametric.equationExpr && (
+                  <p dir="ltr" className="mt-2 text-lg font-extrabold">
+                    {result.parametric.solutions && result.parametric.solutions.length > 0
+                      ? `${result.parametric.paramName} = ${result.parametric.solutions.map((s) => formatNumber(s)).join(",  ")}`
+                      : "אין פתרון ממשי עבור הפרמטר"}
+                  </p>
+                )}
               </>
             ) : (
               <>

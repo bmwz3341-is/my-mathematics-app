@@ -4,8 +4,9 @@ import { useState } from "react";
 import { ChartSpline } from "lucide-react";
 import {
   geoKindLabel,
-  solveGeoSequence,
+  solveGeoSequenceFromText,
   type GeoSequenceInput,
+  type GeoSequenceParamResult,
   type GeoSequenceResult,
 } from "@/lib/geometricSequence";
 import SequenceTermsGraph from "@/components/mathematics/SequenceTermsGraph";
@@ -18,11 +19,11 @@ interface FieldDef {
 }
 
 const FIELDS: FieldDef[] = [
-  { key: "a1", label: "a₁", hint: "איבר ראשון" },
-  { key: "q", label: "q", hint: "מנה" },
+  { key: "a1", label: "a₁", hint: "איבר ראשון (מספר או ביטוי בפרמטר, למשל k)" },
+  { key: "q", label: "q", hint: "מנה (מספר או ביטוי בפרמטר, למשל 2k)" },
   { key: "n", label: "n", hint: "מספר איברים" },
-  { key: "an", label: "aₙ", hint: "איבר אחרון" },
-  { key: "Sn", label: "Sₙ", hint: "סכום" },
+  { key: "an", label: "aₙ", hint: "איבר אחרון (מספר בלבד)" },
+  { key: "Sn", label: "Sₙ", hint: "סכום (מספר בלבד)" },
 ];
 
 interface Example {
@@ -36,6 +37,7 @@ const EXAMPLES: Example[] = [
   { label: "a₁=1, q=3, Sₙ=121", values: { a1: "1", q: "3", Sn: "121" } },
   { label: "a₁=64, q=0.5, n=7", values: { a1: "64", q: "0.5", n: "7" } },
   { label: "a₁=5, q=-2, n=6", values: { a1: "5", q: "-2", n: "6" } },
+  { label: "a₁=3, q=2k, a₃=48 → מצאו k", values: { a1: "3", q: "2k", n: "3", an: "48" } },
 ];
 
 const EMPTY_FORM: Record<keyof GeoSequenceInput, string> = { a1: "", q: "", n: "", an: "", Sn: "" };
@@ -45,10 +47,55 @@ function formatNumber(n: number): string {
   return rounded.toLocaleString("en-US", { maximumFractionDigits: 6 });
 }
 
+function SequenceResultBlock({ result }: { result: Extract<GeoSequenceResult, { type: "result" }> }) {
+  return (
+    <>
+      <div className="mt-5 rounded-xl bg-[#2F6FED] px-4 py-4 text-center text-white shadow-[0_0_18px_rgba(47,111,237,0.5)]">
+        <p className="text-sm font-bold leading-relaxed">{geoKindLabel(result.kind)}</p>
+        <p dir="ltr" className="mt-1 text-2xl font-extrabold">
+          {result.generalTermExpr}
+        </p>
+        <p dir="ltr" className="mt-2 text-sm font-bold leading-relaxed">
+          a₁ = {formatNumber(result.a1)} | q = {formatNumber(result.q)} | n = {formatNumber(result.n)} | a
+          {result.n} = {formatNumber(result.an)} | S{result.n} = {formatNumber(result.Sn)}
+        </p>
+        {result.foundTerm && (
+          <p dir="ltr" className="mt-2 rounded-lg bg-white/20 px-3 py-2 text-xl font-extrabold">
+            a{result.foundTerm.index} = {formatNumber(result.foundTerm.value)}
+          </p>
+        )}
+      </div>
+
+      {result.steps.length > 0 && (
+        <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
+          <p className="text-right text-sm font-extrabold text-black">דרך הפתרון:</p>
+          <ol className="mt-2 space-y-2">
+            {result.steps.map((step, index) => (
+              <li key={index} className="flex flex-row-reverse items-start gap-2">
+                <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#2F6FED] text-xs font-bold text-white">
+                  {index + 1}
+                </span>
+                <span className="flex flex-col items-end gap-0.5">
+                  <span className="text-right text-xs font-bold text-orange-500">{step.law}</span>
+                  <span dir="ltr" className="text-right font-mono text-sm font-bold text-slate-700">
+                    {step.expr}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      <SequenceTermsGraph terms={result.terms} n={result.n} kindText={geoKindLabel(result.kind)} />
+    </>
+  );
+}
+
 export default function GeometricSequenceSolver() {
   const [form, setForm] = useState<Record<keyof GeoSequenceInput, string>>(EMPTY_FORM);
   const [findN, setFindN] = useState("");
-  const [result, setResult] = useState<GeoSequenceResult | null>(null);
+  const [result, setResult] = useState<GeoSequenceParamResult | null>(null);
 
   useDailyChallengeAutoFill("geometricSequences", (challenge) => {
     const values = { ...EMPTY_FORM, ...(challenge.params ?? {}) } as Record<keyof GeoSequenceInput, string>;
@@ -56,24 +103,7 @@ export default function GeometricSequenceSolver() {
     solveWith(values);
   });
 
-  function buildInput(values: Record<keyof GeoSequenceInput, string>): GeoSequenceInput | { error: string } {
-    const input: GeoSequenceInput = {};
-    for (const field of FIELDS) {
-      const raw = values[field.key].trim();
-      if (raw === "") continue;
-      const num = parseFloat(raw);
-      if (!Number.isFinite(num)) return { error: `הערך של ${field.label} אינו מספר תקין` };
-      input[field.key] = num;
-    }
-    return input;
-  }
-
   function solveWith(values: Record<keyof GeoSequenceInput, string>) {
-    const input = buildInput(values);
-    if ("error" in input) {
-      setResult({ type: "error", message: input.error });
-      return;
-    }
     let findIndex: number | undefined;
     const rawFindN = findN.trim();
     if (rawFindN !== "") {
@@ -83,7 +113,12 @@ export default function GeometricSequenceSolver() {
         return;
       }
     }
-    setResult(solveGeoSequence(input, findIndex));
+    setResult(
+      solveGeoSequenceFromText(
+        { a1: values.a1, q: values.q, n: values.n, an: values.an, Sn: values.Sn },
+        findIndex,
+      ),
+    );
   }
 
   function handleSolve() {
@@ -172,46 +207,37 @@ export default function GeometricSequenceSolver() {
         </div>
       )}
 
-      {result?.type === "result" && (
+      {result?.type === "result" && <SequenceResultBlock result={result} />}
+
+      {result?.type === "param-result" && (
         <>
-          <div className="mt-5 rounded-xl bg-[#2F6FED] px-4 py-4 text-center text-white shadow-[0_0_18px_rgba(47,111,237,0.5)]">
-            <p className="text-sm font-bold leading-relaxed">{geoKindLabel(result.kind)}</p>
-            <p dir="ltr" className="mt-1 text-2xl font-extrabold">
-              {result.generalTermExpr}
-            </p>
-            <p dir="ltr" className="mt-2 text-sm font-bold leading-relaxed">
-              a₁ = {formatNumber(result.a1)} | q = {formatNumber(result.q)} | n = {formatNumber(result.n)} | a
-              {result.n} = {formatNumber(result.an)} | S{result.n} = {formatNumber(result.Sn)}
-            </p>
-            {result.foundTerm && (
-              <p dir="ltr" className="mt-2 rounded-lg bg-white/20 px-3 py-2 text-xl font-extrabold">
-                a{result.foundTerm.index} = {formatNumber(result.foundTerm.value)}
-              </p>
-            )}
+          <div className="mt-5 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
+            <p className="text-right text-sm font-extrabold text-black">פתרון עבור הפרמטר {result.paramName}:</p>
+            <ol className="mt-2 space-y-2">
+              {result.steps.map((step, index) => (
+                <li key={index} className="flex flex-row-reverse items-start gap-2">
+                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#2F6FED] text-xs font-bold text-white">
+                    {index + 1}
+                  </span>
+                  <span className="flex flex-col items-end gap-0.5">
+                    <span className="text-right text-xs font-bold text-orange-500">{step.law}</span>
+                    <span dir="ltr" className="text-right font-mono text-sm font-bold text-slate-700">
+                      {step.expr}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ol>
           </div>
 
-          {result.steps.length > 0 && (
-            <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
-              <p className="text-right text-sm font-extrabold text-black">דרך הפתרון:</p>
-              <ol className="mt-2 space-y-2">
-                {result.steps.map((step, index) => (
-                  <li key={index} className="flex flex-row-reverse items-start gap-2">
-                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#2F6FED] text-xs font-bold text-white">
-                      {index + 1}
-                    </span>
-                    <span className="flex flex-col items-end gap-0.5">
-                      <span className="text-right text-xs font-bold text-orange-500">{step.law}</span>
-                      <span dir="ltr" className="text-right font-mono text-sm font-bold text-slate-700">
-                        {step.expr}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
+          {result.solutions.map((sol, index) => (
+            <div key={index} className="mt-4 border-t-2 border-dashed border-white/60 pt-4">
+              <p dir="ltr" className="text-right text-base font-extrabold text-slate-700">
+                {result.paramName} = {formatNumber(sol.paramValue)}
+              </p>
+              <SequenceResultBlock result={sol.sequence as Extract<GeoSequenceResult, { type: "result" }>} />
             </div>
-          )}
-
-          <SequenceTermsGraph terms={result.terms} n={result.n} kindText={geoKindLabel(result.kind)} />
+          ))}
         </>
       )}
     </div>

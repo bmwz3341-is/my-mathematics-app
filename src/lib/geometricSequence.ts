@@ -5,7 +5,28 @@
  * an = a1 * q^(n-1) and Sn = a1 * (q^n - 1)/(q - 1) (or n*a1 when q = 1),
  * recording pedagogical steps. Combinations with no closed form (finding q
  * from a sum) are solved numerically by scanning for sign changes.
+ *
+ * solveGeoSequenceFromText additionally accepts a1 and/or q as algebraic
+ * expressions in a single free parameter (e.g. q = "2k"): given n and a
+ * numeric target (an or Sn), it builds the corresponding polynomial equation
+ * in that parameter, solves it, and re-runs the plain numeric engine above
+ * for each real solution.
  */
+
+import {
+  type Sym,
+  parseAlgebraic,
+  symVariables,
+  symConstValue,
+  symMul,
+  symSub,
+  symPow,
+  symConst,
+  polyCoefficients,
+  solveRealPolynomial,
+  evalSymSingleVar,
+  formatPolyInVar,
+} from "./symbolicAlgebra";
 
 export class GeoSequenceError extends Error {
   constructor(message: string) {
@@ -56,7 +77,7 @@ function nearlyEqual(x: number, y: number): boolean {
   return Math.abs(x - y) <= 1e-6 * Math.max(1, Math.abs(x), Math.abs(y));
 }
 
-function validateN(n: number, source: string): number {
+export function validateN(n: number, source: string): number {
   if (!Number.isFinite(n) || Math.abs(n - Math.round(n)) > 1e-6 || Math.round(n) < 1) {
     throw new GeoSequenceError(`${source} נותן n=${formatNumber(n)}, אבל n חייב להיות מספר שלם חיובי`);
   }
@@ -365,4 +386,165 @@ export function solveGeoSequence(input: GeoSequenceInput, findIndex?: number): G
       message: err instanceof GeoSequenceError ? err.message : "שגיאה בעיבוד הנתונים",
     };
   }
+}
+
+/** Text-form input where a1 and/or q may hold an algebraic expression instead of a plain number. */
+export interface GeoSequenceRawInput {
+  a1?: string;
+  q?: string;
+  n?: string;
+  an?: string;
+  Sn?: string;
+}
+
+export interface GeoSequenceParamSolution {
+  paramValue: number;
+  a1: number;
+  q: number;
+  sequence: GeoSequenceResult;
+}
+
+export type GeoSequenceParamResult =
+  | GeoSequenceResult
+  | {
+      type: "param-result";
+      paramName: string;
+      equationExpr: string;
+      steps: GeoSequenceStep[];
+      solutions: GeoSequenceParamSolution[];
+    };
+
+function parseFieldSym(raw: string | undefined, label: string): Sym | { error: string } {
+  if (raw === undefined || raw.trim() === "") return [];
+  const normalized = raw.trim().replace(/\s+/g, "").replace(/\*\*/g, "^");
+  try {
+    return parseAlgebraic(normalized);
+  } catch (err) {
+    return { error: `הערך של ${label} אינו תקין: ${err instanceof Error ? err.message : "שגיאה בעיבוד הביטוי"}` };
+  }
+}
+
+/**
+ * Resolves a geometric-sequence input given as text. When a1/q are plain
+ * numbers this behaves exactly like solveGeoSequence. When exactly one of
+ * them carries a single free-letter parameter, n and a numeric an/Sn target
+ * are required; the parameter is solved for via the corresponding polynomial
+ * equation (denominators cleared for the sum formula), and the ordinary
+ * engine is re-run for each real solution found.
+ */
+export function solveGeoSequenceFromText(raw: GeoSequenceRawInput, findIndex?: number): GeoSequenceParamResult {
+  const a1Parsed = parseFieldSym(raw.a1, "a₁");
+  if ("error" in a1Parsed) return { type: "error", message: a1Parsed.error };
+  const qParsed = parseFieldSym(raw.q, "q");
+  if ("error" in qParsed) return { type: "error", message: qParsed.error };
+
+  const a1Sym = raw.a1 !== undefined && raw.a1.trim() !== "" ? a1Parsed : undefined;
+  const qSym = raw.q !== undefined && raw.q.trim() !== "" ? qParsed : undefined;
+
+  let nNum: number | undefined;
+  if (raw.n !== undefined && raw.n.trim() !== "") {
+    const parsed = parseFloat(raw.n.trim());
+    if (!Number.isFinite(parsed)) return { type: "error", message: "הערך של n אינו מספר תקין" };
+    nNum = parsed;
+  }
+  let anNum: number | undefined;
+  if (raw.an !== undefined && raw.an.trim() !== "") {
+    const parsed = parseFloat(raw.an.trim());
+    if (!Number.isFinite(parsed)) return { type: "error", message: "aₙ חייב להיות מספר (אינו יכול להכיל פרמטר)" };
+    anNum = parsed;
+  }
+  let SnNum: number | undefined;
+  if (raw.Sn !== undefined && raw.Sn.trim() !== "") {
+    const parsed = parseFloat(raw.Sn.trim());
+    if (!Number.isFinite(parsed)) return { type: "error", message: "Sₙ חייב להיות מספר (אינו יכול להכיל פרמטר)" };
+    SnNum = parsed;
+  }
+
+  const params = new Set<string>([...(a1Sym ? symVariables(a1Sym) : []), ...(qSym ? symVariables(qSym) : [])]);
+
+  if (params.size === 0) {
+    const input: GeoSequenceInput = {};
+    if (a1Sym) input.a1 = symConstValue(a1Sym);
+    if (qSym) input.q = symConstValue(qSym);
+    if (nNum !== undefined) input.n = nNum;
+    if (anNum !== undefined) input.an = anNum;
+    if (SnNum !== undefined) input.Sn = SnNum;
+    return solveGeoSequence(input, findIndex);
+  }
+
+  if (params.size > 1) {
+    return { type: "error", message: `נתמך פרמטר יחיד ב-a₁/q (זוהו: ${[...params].join(", ")})` };
+  }
+
+  const paramName = [...params][0];
+  if (paramName === "n") {
+    return { type: "error", message: "אין להשתמש באות n כפרמטר — n שמור למספר האיברים בסדרה" };
+  }
+  if (!a1Sym || !qSym) {
+    return { type: "error", message: "לפתרון עבור פרמטר יש להזין גם את a₁ וגם את q (כמספר או כביטוי עם הפרמטר)" };
+  }
+  if (nNum === undefined) {
+    return { type: "error", message: "כדי לפתור עבור פרמטר יש להזין גם את n" };
+  }
+  if (anNum === undefined && SnNum === undefined) {
+    return { type: "error", message: "כדי לפתור עבור פרמטר יש להזין ערך מספרי עבור aₙ או Sₙ" };
+  }
+
+  let n: number;
+  try {
+    n = validateN(nNum, "n");
+  } catch (err) {
+    return { type: "error", message: err instanceof Error ? err.message : "ערך n לא תקין" };
+  }
+
+  let eqSym: Sym;
+  let lawLabel: string;
+  if (anNum !== undefined) {
+    eqSym = symSub(symMul(a1Sym, symPow(qSym, n - 1)), symConst(anNum));
+    lawLabel = "בניית משוואה בפרמטר מתוך aₙ = a₁·qⁿ⁻¹";
+  } else {
+    eqSym = symSub(symMul(symConst(SnNum!), symSub(qSym, symConst(1))), symMul(a1Sym, symSub(symPow(qSym, n), symConst(1))));
+    lawLabel = "בניית משוואה בפרמטר מתוך Sₙ = a₁·(qⁿ-1)/(q-1), לאחר ניקוי המכנה (q-1)";
+  }
+
+  const equationExpr = `${formatPolyInVar(eqSym, paramName)} = 0`;
+  const steps: GeoSequenceStep[] = [{ law: lawLabel, expr: equationExpr }];
+
+  const coeffs = polyCoefficients(eqSym, paramName);
+  const rawSolutions = solveRealPolynomial(coeffs);
+  if (rawSolutions.length === 0) {
+    return { type: "error", message: `לא נמצא ערך ממשי של ${paramName} שמקיים את המשוואה ${equationExpr}` };
+  }
+
+  const solutions: GeoSequenceParamSolution[] = [];
+  for (const val of rawSolutions) {
+    let a1Resolved: number;
+    let qResolved: number;
+    try {
+      a1Resolved = evalSymSingleVar(a1Sym, paramName, val);
+      qResolved = evalSymSingleVar(qSym, paramName, val);
+    } catch {
+      continue;
+    }
+    if (!Number.isFinite(a1Resolved) || !Number.isFinite(qResolved)) continue;
+
+    const seqInput: GeoSequenceInput = { a1: a1Resolved, q: qResolved, n };
+    if (anNum !== undefined) seqInput.an = anNum;
+    if (SnNum !== undefined) seqInput.Sn = SnNum;
+    const seqResult = solveGeoSequence(seqInput, findIndex);
+    if (seqResult.type === "result") {
+      solutions.push({ paramValue: val, a1: a1Resolved, q: qResolved, sequence: seqResult });
+    }
+  }
+
+  if (solutions.length === 0) {
+    return { type: "error", message: "נמצאו ערכים עבור הפרמטר, אך אף אחד מהם אינו נותן סדרה הנדסית תקינה (a₁≠0, q≠0)" };
+  }
+
+  steps.push({
+    law: "פתרונות המשוואה",
+    expr: solutions.map((s) => `${paramName} = ${formatNumber(s.paramValue)}`).join(",  "),
+  });
+
+  return { type: "param-result", paramName, equationExpr, steps, solutions };
 }

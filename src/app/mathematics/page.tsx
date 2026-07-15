@@ -21,6 +21,8 @@ const ALGEBRA_TRACK_IDS = [
   "systemOfEquations",
   "quadraticEquations",
   "systemOf3Equations",
+  "derivatives",
+  "integralCalculator",
 ];
 
 export default function MathematicsPage() {

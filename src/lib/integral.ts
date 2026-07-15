@@ -3,8 +3,27 @@
  * power monomials (coeff * x^n), sin(x)/cos(x), and e^x, then applies the
  * power/trig/exponential integration rules term by term. Supports both the
  * indefinite integral (+C) and the definite integral via the Newton-Leibniz
- * substitution F(b) - F(a).
+ * substitution F(b) - F(a). Definite bounds may also be linear expressions in
+ * a single free parameter (e.g. "2a" to "3a"), in which case F(b) - F(a) is
+ * produced as an algebraic expression in that parameter, optionally solved
+ * against a given target value.
  */
+
+import {
+  type Sym,
+  symAdd,
+  symSub,
+  symScale,
+  symPow,
+  symConst,
+  symConstValue,
+  symVariables,
+  formatSym,
+  formatPolyInVar,
+  polyCoefficients,
+  solveRealPolynomial,
+  parseAlgebraic,
+} from "./symbolicAlgebra";
 
 export class IntegralError extends Error {
   constructor(message: string) {
@@ -43,6 +62,14 @@ export type IntegralResult =
       valueAtA?: number;
       valueAtB?: number;
       definiteValue?: number;
+      parametric?: {
+        paramName: string;
+        aExpr: string;
+        bExpr: string;
+        definiteExpr: string;
+        equationExpr?: string;
+        solutions?: number[];
+      };
     }
   | { type: "error"; message: string };
 
@@ -207,7 +234,30 @@ export function parseIntegrand(input: string, variable: string): Term[] {
   return splitTerms(normalized).map((t) => parseTerm(t, variable));
 }
 
-export function integrate(input: string, mode: IntegralMode, aInput?: string, bInput?: string): IntegralResult {
+/** Parses an integration bound as an algebraic expression (number or linear-in-parameter). */
+function parseBoundSym(raw: string | undefined, label: string, integrationVar: string): Sym {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed) throw new IntegralError(`נא להזין גבול ${label} של האינטגרל`);
+  const normalized = trimmed.replace(/\s+/g, "").replace(/\*\*/g, "^");
+  let sym: Sym;
+  try {
+    sym = parseAlgebraic(normalized);
+  } catch (err) {
+    throw new IntegralError(`גבול ${label} לא תקין: ${err instanceof Error ? err.message : "שגיאה בעיבוד הביטוי"}`);
+  }
+  if (symVariables(sym).includes(integrationVar)) {
+    throw new IntegralError(`גבול ${label} אינו יכול להכיל את משתנה האינטגרציה (${integrationVar})`);
+  }
+  return sym;
+}
+
+export function integrate(
+  input: string,
+  mode: IntegralMode,
+  aInput?: string,
+  bInput?: string,
+  targetValue?: string,
+): IntegralResult {
   const trimmed = input.trim();
   if (!trimmed) return { type: "error", message: "נא להזין פונקציה, למשל x^2 + sin(x)" };
   if (trimmed.includes("=")) {
@@ -215,17 +265,29 @@ export function integrate(input: string, mode: IntegralMode, aInput?: string, bI
   }
 
   const variable = detectVariable(trimmed);
-  let a = 0;
-  let b = 0;
-  if (mode === "definite") {
-    a = parseFloat((aInput ?? "").trim());
-    b = parseFloat((bInput ?? "").trim());
-    if (!Number.isFinite(a) || !Number.isFinite(b)) {
-      return { type: "error", message: "נא להזין גבולות אינטגרציה מספריים (a ו-b)" };
-    }
-  }
 
   try {
+    let a = 0;
+    let b = 0;
+    let aSym: Sym = [];
+    let bSym: Sym = [];
+    let paramName: string | null = null;
+
+    if (mode === "definite") {
+      aSym = parseBoundSym(aInput, "תחתון (a)", variable);
+      bSym = parseBoundSym(bInput, "עליון (b)", variable);
+      const params = new Set([...symVariables(aSym), ...symVariables(bSym)]);
+      if (params.size > 1) {
+        throw new IntegralError(`נתמך פרמטר יחיד בגבולות האינטגרציה (זוהו: ${[...params].join(", ")})`);
+      }
+      if (params.size === 1) {
+        paramName = [...params][0];
+      } else {
+        a = symConstValue(aSym);
+        b = symConstValue(bSym);
+      }
+    }
+
     const terms = combineLikeTerms(parseIntegrand(trimmed, variable));
     const steps: IntegralStep[] = [];
     const antiderivativeRaw: Term[] = [];
@@ -258,6 +320,73 @@ export function integrate(input: string, mode: IntegralMode, aInput?: string, bI
         originalTerms: terms,
         antiderivativeTerms,
         steps,
+      };
+    }
+
+    if (paramName) {
+      for (const t of antiderivativeTerms) {
+        if (t.kind !== "power") {
+          throw new IntegralError("גבולות פרמטריים נתמכים כרגע רק עבור פונקציות פולינומיאליות (לא sin, cos או e^x)");
+        }
+        if (t.power === undefined || t.power < 0) {
+          throw new IntegralError("גבולות פרמטריים אינם נתמכים עבור חזקות שליליות (1/xⁿ)");
+        }
+      }
+
+      const substitute = (boundSym: Sym): Sym =>
+        antiderivativeTerms.reduce(
+          (acc, t) => symAdd(acc, symScale(symPow(boundSym, t.power!), t.coefficient)),
+          [] as Sym,
+        );
+
+      const FA = substitute(aSym);
+      const FB = substitute(bSym);
+      const definiteSym = symSub(FB, FA);
+      const antiderivativeExpr = formatExpression(antiderivativeTerms, variable);
+      const aExpr = formatSym(aSym);
+      const bExpr = formatSym(bSym);
+      const definiteExpr = formatPolyInVar(definiteSym, paramName);
+
+      steps.push({
+        law: "משפט ניוטון-לייבניץ עם גבולות פרמטריים: ∫ₐᵇ f(x)dx = F(b) - F(a)",
+        expr: `F(${bExpr}) - F(${aExpr}) = (${formatPolyInVar(FB, paramName)}) - (${formatPolyInVar(FA, paramName)})`,
+      });
+      steps.push({
+        law: "תוצאה סופית — ביטוי במונחי הפרמטר",
+        expr: `∫_{${aExpr}}^{${bExpr}} (${originalExpr}) d${variable} = ${definiteExpr}`,
+      });
+
+      let equationExpr: string | undefined;
+      let solutions: number[] | undefined;
+      const targetTrimmed = (targetValue ?? "").trim();
+      if (targetTrimmed) {
+        const targetNum = parseFloat(targetTrimmed);
+        if (!Number.isFinite(targetNum)) {
+          throw new IntegralError("ערך היעד חייב להיות מספר");
+        }
+        const eqSym = symSub(definiteSym, symConst(targetNum));
+        const coeffs = polyCoefficients(eqSym, paramName);
+        solutions = solveRealPolynomial(coeffs);
+        equationExpr = `${definiteExpr} = ${formatNumber(targetNum)}`;
+        steps.push({
+          law: "השוואה לערך הנתון ופתרון עבור הפרמטר",
+          expr:
+            solutions.length > 0
+              ? `${equationExpr}  ⇒  ${solutions.map((s) => `${paramName} = ${formatNumber(s)}`).join(",  ")}`
+              : `${equationExpr}  ⇒  אין פתרון ממשי`,
+        });
+      }
+
+      return {
+        type: "result",
+        mode,
+        variable,
+        originalExpr,
+        antiderivativeExpr,
+        originalTerms: terms,
+        antiderivativeTerms,
+        steps,
+        parametric: { paramName, aExpr, bExpr, definiteExpr, equationExpr, solutions },
       };
     }
 
