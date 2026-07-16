@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Heebo } from "next/font/google";
 import { ArrowRight } from "lucide-react";
+import PlaneLineSolver from "@/components/mathematics/PlaneLineSolver";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
@@ -20,9 +21,9 @@ export default function PlaneAndLineEquationsPage() {
 
       <div className="relative">
         <h1 className="text-right text-2xl font-extrabold text-sky-700 sm:text-3xl">משוואת מישור וישר</h1>
-        <div className="mt-6 rounded-2xl border border-white/60 bg-white/35 p-6 text-center backdrop-blur-xl backdrop-saturate-150">
-          <p className="text-base font-bold text-slate-700">המחשבון לנושא זה בבנייה ויעלה בקרוב.</p>
-          <p className="mt-2 text-sm font-medium text-slate-500">בינתיים אפשר לחזור ולבחור נושא אחר.</p>
+        <p className="mt-1 text-right text-sm font-bold text-indigo-400">גיאומטריה אנליטית במרחב</p>
+        <div className="mt-6">
+          <PlaneLineSolver />
         </div>
       </div>
 

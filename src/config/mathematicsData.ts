@@ -1,4 +1,4 @@
-import { Calculator, ChartArea, ChartLine, ChartSpline, Crosshair, Dices, GitMerge, Layers3, Logs, Orbit, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
+import { Calculator, ChartArea, ChartSpline, Crosshair, Dices, GitMerge, Layers3, Logs, Orbit, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface MathItem {
@@ -45,15 +45,8 @@ export const mathItems: MathItem[] = [
     href: "/mathematics/logarithmic-equations",
   },
   {
-    id: "derivatives",
-    label: "גזירת פונקציות והצגה בגרף",
-    icon: ChartLine,
-    color: "bg-rose-500",
-    href: "/mathematics/derivatives",
-  },
-  {
     id: "functionAnalysis",
-    label: "גרפים וחקירת פונקציות",
+    label: "חקירת פונקציות",
     icon: Crosshair,
     color: "bg-red-500",
     badge: "f(x)",

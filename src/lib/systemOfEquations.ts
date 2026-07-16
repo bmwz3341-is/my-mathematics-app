@@ -73,6 +73,7 @@ interface ParsedTerm {
   value: number;
 }
 
+/** Parses one term, allowing an optional numeric denominator, e.g. "x/2", "3y/4", "5/2". */
 function parseTerm(raw: string): ParsedTerm {
   let s = raw.replace(/\s+/g, "");
   let sign = 1;
@@ -85,19 +86,27 @@ function parseTerm(raw: string): ParsedTerm {
   if (s === "") throw new Error(`איבר לא תקין: "${raw}"`);
   if (s.includes("^")) throw new Error("נתמכות רק משוואות לינאריות (ללא חזקות)");
 
-  const match = s.match(/^(\d+(?:\.\d+)?)?([a-zA-Z])?$/);
+  const match = s.match(/^(\d+(?:\.\d+)?)?([a-zA-Z])?(?:\/(\d+(?:\.\d+)?))?$/);
   if (!match || (!match[1] && !match[2])) {
     throw new Error(`איבר לא תקין: "${raw}"`);
   }
-  const [, coefStr, varLetter] = match;
+  const [, coefStr, varLetter, denomStr] = match;
+  let value = varLetter ? (coefStr ? parseFloat(coefStr) : 1) : parseFloat(coefStr!);
+  if (denomStr) {
+    const denom = parseFloat(denomStr);
+    if (!Number.isFinite(denom) || denom === 0) throw new Error(`מכנה לא תקין באיבר: "${raw}"`);
+    value /= denom;
+  }
+  value *= sign;
+
   if (varLetter) {
     const lower = varLetter.toLowerCase();
     if (lower !== "x" && lower !== "y") {
       throw new Error(`נתמכים רק המשתנים x ו-y (נמצא "${varLetter}")`);
     }
-    return { variable: lower, value: sign * (coefStr ? parseFloat(coefStr) : 1) };
+    return { variable: lower, value };
   }
-  return { variable: null, value: sign * parseFloat(coefStr!) };
+  return { variable: null, value };
 }
 
 function parseSide(side: string): { x: number; y: number; c: number } {

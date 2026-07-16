@@ -12,7 +12,7 @@
  * and the one that most reduces a complexity score is kept. This is not an
  * exhaustive/optimal simplifier — it is designed to solve the "clean path"
  * exercises typical of bagrut identity proofs, not arbitrary trig algebra.
- * Scope: sin/cos/tan only (no sec/csc/cot), single variable x, linear
+ * Scope: sin/cos/tan/cot only (no sec/csc), single variable x, linear
  * arguments only, Pythagorean substitution only at exponent 2.
  */
 
@@ -42,7 +42,7 @@ export class TrigIdentityError extends Error {
   }
 }
 
-export type TrigFn = "sin" | "cos" | "tan";
+export type TrigFn = "sin" | "cos" | "tan" | "cot";
 
 export interface TrigIdentityStep {
   law: string;
@@ -52,7 +52,7 @@ export interface TrigIdentityStep {
 
 export type TrigIdentityResult =
   | { type: "result"; original: string; simplified: string; steps: TrigIdentityStep[] }
-  | { type: "error"; message: string };
+  | { type: "error"; message: string; hint?: string };
 
 interface Rational {
   num: Sym;
@@ -139,13 +139,24 @@ function divideByMonomial(sym: Sym, mono: { vars: Record<string, number>; coeff:
   }));
 }
 
+/** Rescales num/den so a single-term denominator has a leading coefficient of 1 (e.g. "1/0.5tan(x)" -> "2/tan(x)"). Coefficient-only, so it never affects scoreVector. */
+function normalizeLeadingDenCoeff(r: Rational): Rational {
+  if (r.den.length !== 1) return r;
+  const k = r.den[0].coeff;
+  if (Math.abs(k - 1) < 1e-9) return r;
+  return {
+    num: r.num.map((t) => ({ ...t, coeff: t.coeff / k })),
+    den: r.den.map((t) => ({ ...t, coeff: t.coeff / k })),
+  };
+}
+
 function ratReduce(r: Rational): Rational {
   if (r.num.length === 0) return { num: [], den: symConst(1) };
   const allTerms = [...r.num, ...r.den];
   const mono = commonMonomial(allTerms);
   const nontrivial = mono.coeff !== 1 || Object.values(mono.vars).some((v) => v !== 0);
-  if (!nontrivial) return r;
-  return { num: divideByMonomial(r.num, mono), den: divideByMonomial(r.den, mono) };
+  const reduced = nontrivial ? { num: divideByMonomial(r.num, mono), den: divideByMonomial(r.den, mono) } : r;
+  return normalizeLeadingDenCoeff(reduced);
 }
 
 function ratFromConst(n: number): Rational {
@@ -261,7 +272,7 @@ function parseRationalExpr(input: string, atoms: AtomMap): Rational {
       i++;
       return inner;
     }
-    for (const fn of ["sin", "cos", "tan"] as const) {
+    for (const fn of ["sin", "cos", "tan", "cot"] as const) {
       if (s.startsWith(fn, i) && s[i + fn.length] === "(") {
         i += fn.length + 1;
         const argStart = i;
@@ -471,6 +482,41 @@ function trySumDifferenceCollapse(sym: Sym, atoms: AtomMap): Sym | null {
   return null;
 }
 
+/**
+ * sin(θ)^p * cos(θ)^p (same θ, matching powers, within a single term) -> (sin(2θ)/2)^p.
+ * Unlike the other collapses this looks inside one term rather than pairing two terms —
+ * it's what lets e.g. sin(x)cos(x) in a denominator line up with a cos(2x) elsewhere.
+ * Always a strict win under scoreVector (fewer atoms, half the degree, same term count),
+ * so — like the other collapses — it fires unconditionally whenever found.
+ */
+function tryDoubleAngleProductCollapse(sym: Sym, atoms: AtomMap): Sym | null {
+  for (let idx = 0; idx < sym.length; idx++) {
+    const t = sym[idx];
+    const keys = Object.keys(t.vars).filter((k) => (t.vars[k] ?? 0) !== 0);
+    for (const sinKey of keys) {
+      const sinInfo = atoms.get(sinKey);
+      if (!sinInfo || sinInfo.fn !== "sin") continue;
+      const p = t.vars[sinKey];
+      for (const cosKey of keys) {
+        if (cosKey === sinKey) continue;
+        const cosInfo = atoms.get(cosKey);
+        if (!cosInfo || cosInfo.fn !== "cos") continue;
+        if (t.vars[cosKey] !== p || !sameArg(sinInfo, cosInfo)) continue;
+
+        const dblKey = registerAtom(atoms, "sin", sinInfo.m * 2, sinInfo.c * 2);
+        const restVars = { ...t.vars };
+        delete restVars[sinKey];
+        delete restVars[cosKey];
+        restVars[dblKey] = (restVars[dblKey] ?? 0) + p;
+        const newTerm: SymTerm = { vars: restVars, coeff: t.coeff / Math.pow(2, p) };
+        const rest = sym.filter((_, i) => i !== idx);
+        return symAdd(rest, [newTerm]);
+      }
+    }
+  }
+  return null;
+}
+
 /* ------------------------------------------------------------------ */
 /* Search candidates (identity substitutions, scored by complexity)    */
 /* ------------------------------------------------------------------ */
@@ -533,7 +579,7 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
         2,
         ratFromSym(symSub(symConst(1), symPow(symParam(cosKey), 2))),
         "זהות פיתגורס",
-        `${label}² הוחלף לפי sin²θ=1-cos²θ, בביטוי עם ${canonicalKey("cos", info.m, info.c)}`,
+        `**${label}²** הוחלף לפי sin²θ=1-cos²θ, בביטוי עם **${canonicalKey("cos", info.m, info.c)}**`,
       );
       if (pyth) out.push(pyth);
 
@@ -546,7 +592,7 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
           key,
           ratFromSym(symScale(symMul(symParam(sinHalfKey), symParam(cosHalfKey)), 2)),
           "זהות זווית כפולה",
-          `${label} הוחלף לפי sinθ=2sin(θ/2)cos(θ/2)`,
+          `**${label}** הוחלף לפי sinθ=2sin(θ/2)cos(θ/2)`,
         ),
       );
 
@@ -558,7 +604,7 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
         2,
         ratFromSym(symScale(symSub(symConst(1), symParam(cosDblKey)), 0.5)),
         "זהות זווית כפולה (היוצג כמחצית)",
-        `${label}² הוחלף לפי sin²θ=(1-cos(2θ))/2`,
+        `**${label}²** הוחלף לפי sin²θ=(1-cos(2θ))/2`,
       );
       if (halfSq) out.push(halfSq);
 
@@ -570,7 +616,7 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
           key,
           ratFromSym(symMul(symParam(tanKeyForSin), symParam(cosKey))),
           "זהות המנה (tan=sin/cos)",
-          `${label} הוחלף לפי sinθ=tanθ·cosθ, כדי לאפשר צמצום עם cos באותה זווית`,
+          `**${label}** הוחלף לפי sinθ=tanθ·cosθ, כדי לאפשר צמצום עם cos באותה זווית`,
         ),
       );
     } else if (info.fn === "cos") {
@@ -582,7 +628,7 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
         2,
         ratFromSym(symSub(symConst(1), symPow(symParam(sinKey), 2))),
         "זהות פיתגורס",
-        `${label}² הוחלף לפי cos²θ=1-sin²θ, בביטוי עם ${canonicalKey("sin", info.m, info.c)}`,
+        `**${label}²** הוחלף לפי cos²θ=1-sin²θ, בביטוי עם **${canonicalKey("sin", info.m, info.c)}**`,
       );
       if (pyth) out.push(pyth);
 
@@ -595,7 +641,7 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
           key,
           ratFromSym(symSub(symConst(1), symScale(symPow(symParam(sinHalfKey), 2), 2))),
           "זהות זווית כפולה",
-          `${label} הוחלף לפי cosθ=1-2sin²(θ/2)`,
+          `**${label}** הוחלף לפי cosθ=1-2sin²(θ/2)`,
         ),
       );
       out.push(
@@ -605,7 +651,7 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
           key,
           ratFromSym(symSub(symScale(symPow(symParam(cosHalfKey), 2), 2), symConst(1))),
           "זהות זווית כפולה",
-          `${label} הוחלף לפי cosθ=2cos²(θ/2)-1`,
+          `**${label}** הוחלף לפי cosθ=2cos²(θ/2)-1`,
         ),
       );
 
@@ -617,10 +663,10 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
         2,
         ratFromSym(symScale(symAdd(symConst(1), symParam(cosDblKey)), 0.5)),
         "זהות זווית כפולה (היוצג כמחצית)",
-        `${label}² הוחלף לפי cos²θ=(1+cos(2θ))/2`,
+        `**${label}²** הוחלף לפי cos²θ=(1+cos(2θ))/2`,
       );
       if (halfSq) out.push(halfSq);
-    } else {
+    } else if (info.fn === "tan") {
       const sinKey = registerAtom(atoms, "sin", info.m, info.c);
       const cosKey = registerAtom(atoms, "cos", info.m, info.c);
       out.push(
@@ -630,7 +676,20 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
           key,
           { num: symParam(sinKey), den: symParam(cosKey) },
           "tan = sin/cos",
-          `${label} הוחלף לפי tanθ=sinθ/cosθ`,
+          `**${label}** הוחלף לפי tanθ=sinθ/cosθ`,
+        ),
+      );
+    } else {
+      const sinKey = registerAtom(atoms, "sin", info.m, info.c);
+      const cosKey = registerAtom(atoms, "cos", info.m, info.c);
+      out.push(
+        makeAnyPowerCandidate(
+          side,
+          r,
+          key,
+          { num: symParam(cosKey), den: symParam(sinKey) },
+          "cot = cos/sin",
+          `**${label}** הוחלף לפי cotθ=cosθ/sinθ`,
         ),
       );
     }
@@ -639,11 +698,40 @@ function generateCandidatesForSide(r: Rational, atoms: AtomMap, side: "num" | "d
   return out;
 }
 
-function complexityScore(r: Rational): number {
-  const allTerms = [...r.num, ...r.den];
+/**
+ * Lexicographic complexity score: (argument mismatch, total term count, unique atom count,
+ * total degree). Term count dominates the last three because it is the most reliable proxy
+ * for "did this actually get simpler" — merging two distinct atoms into one (lower atom
+ * count) is only a win if it doesn't also expand the term count (see collapseFully / the
+ * candidate-selection lookahead below, which is what makes that distinction possible).
+ *
+ * `foreign` only matters in "prove identity" mode: it counts how many distinct argument
+ * multiples (the m in sin(mx+c)) appear in the expression but not in `targetArgs` — the set
+ * of argument multiples used on the *other* side of the identity. It's checked first,
+ * ahead of term count, so a substitution that speaks the other side's "language" (e.g.
+ * cos(2x) -> terms in x, when the other side is all in x) is taken even when it makes the
+ * term/atom/degree counts temporarily worse — that's the forced-expansion behavior proof
+ * mode needs and plain simplify mode must never pay for. targetArgs is only ever passed by
+ * the proof-mode caller; ordinary simplification always leaves it undefined, so `foreign`
+ * stays 0 for both sides of every comparison and this dimension is a no-op.
+ */
+interface ScoreVec {
+  foreign: number;
+  terms: number;
+  atoms: number;
+  degree: number;
+}
+
+function isTrivialOne(sym: Sym): boolean {
+  return symIsPureConst(sym) && Math.abs(symConstValue(sym) - 1) < 1e-9;
+}
+
+function scoreVector(r: Rational, atoms: AtomMap, targetArgs?: Set<number>): ScoreVec {
+  const numTerms = r.num.length;
+  const denTerms = isTrivialOne(r.den) ? 0 : r.den.length;
   const atomKeys = new Set<string>();
   let totalDeg = 0;
-  for (const t of allTerms) {
+  for (const t of [...r.num, ...r.den]) {
     for (const [k, p] of Object.entries(t.vars)) {
       if (p !== 0) {
         atomKeys.add(k);
@@ -651,7 +739,48 @@ function complexityScore(r: Rational): number {
       }
     }
   }
-  return atomKeys.size * 100 + allTerms.length * 10 + totalDeg;
+  let foreign = 0;
+  if (targetArgs && targetArgs.size > 0) {
+    const argMultiples = new Set<number>();
+    for (const key of atomKeys) argMultiples.add(atoms.get(key)!.m);
+    for (const m of argMultiples) if (!targetArgs.has(m)) foreign++;
+  }
+  return { foreign, terms: numTerms + denTerms, atoms: atomKeys.size, degree: totalDeg };
+}
+
+function compareScore(a: ScoreVec, b: ScoreVec): number {
+  if (a.foreign !== b.foreign) return a.foreign - b.foreign;
+  if (a.terms !== b.terms) return a.terms - b.terms;
+  if (a.atoms !== b.atoms) return a.atoms - b.atoms;
+  return a.degree - b.degree;
+}
+
+/**
+ * Applies one eager collapse (Pythagorean or sum/difference) to num, else den, if either
+ * pattern matches; returns null if neither applies.
+ */
+function collapseOnce(r: Rational, atoms: AtomMap): Rational | null {
+  const collapsedNum = tryPythagoreanCollapse(r.num, atoms) ?? trySumDifferenceCollapse(r.num, atoms) ?? tryDoubleAngleProductCollapse(r.num, atoms);
+  if (collapsedNum) return ratReduce({ num: collapsedNum, den: r.den });
+  const collapsedDen = tryPythagoreanCollapse(r.den, atoms) ?? trySumDifferenceCollapse(r.den, atoms) ?? tryDoubleAngleProductCollapse(r.den, atoms);
+  if (collapsedDen) return ratReduce({ num: r.num, den: collapsedDen });
+  return null;
+}
+
+/**
+ * One-step-ahead lookahead used when scoring a candidate substitution: a substitution that
+ * temporarily raises the term count is only worth taking if it immediately unlocks a
+ * collapse (e.g. completes a Pythagorean pair) — so candidates are scored on their state
+ * *after* any collapse that becomes available, not on their raw post-substitution form.
+ */
+function collapseFully(r: Rational, atoms: AtomMap): Rational {
+  let cur = r;
+  for (let i = 0; i < 5; i++) {
+    const next = collapseOnce(cur, atoms);
+    if (!next) break;
+    cur = next;
+  }
+  return cur;
 }
 
 /* ------------------------------------------------------------------ */
@@ -672,23 +801,61 @@ function formatRational(r: Rational): string {
 
 const MAX_ITERATIONS = 8;
 
-export function simplifyTrigExpression(input: string): TrigIdentityResult {
+/**
+ * Standing tip shown alongside parse errors. Math snippets are wrapped in `backticks` so the
+ * UI can render them as isolated LTR spans — inlined directly in an RTL sentence, parentheses
+ * in a snippet like (1-cos(x))/sin(x) get bidi-reordered by the browser and look garbled/cut.
+ */
+const PARSE_HINT =
+  "ודאו שכל פונקציה (sin, cos, tan, cot) נכתבת עם סוגריים סביב הזווית, ושמכנה של שבר עם יותר " +
+  "מאיבר אחד עטוף בסוגריים — למשל `(1-cos(x))/sin(x)` ולא `1-cos(x)/sin(x)`.";
+
+/**
+ * Parses `input` just far enough to report which argument multiples (the m in sin(mx+c))
+ * it uses — e.g. "cos(2x)+tan(x)" -> {1, 2}. Used by proof mode to tell each side what
+ * "language" (argument vocabulary) the other side speaks, so it knows what to expand
+ * toward. Returns an empty set on any parse failure — the caller degrades to plain
+ * simplification with no target bias, never a proof-mode crash.
+ */
+export function collectArgumentMultipliers(input: string): Set<number> {
+  try {
+    const atoms: AtomMap = new Map();
+    parseRationalExpr(input.trim(), atoms);
+    return new Set([...atoms.values()].map((a) => a.m));
+  } catch {
+    return new Set();
+  }
+}
+
+/**
+ * `targetArgs`, when passed (proof mode only), biases the greedy search toward the argument
+ * vocabulary used by the other side of an identity — see the `foreign` field of ScoreVec.
+ * Plain simplification (the default) never passes it, so this is a pure no-op there: the
+ * exact same candidates, collapses, and lexicographic comparisons as before.
+ */
+export function simplifyTrigExpression(input: string, targetArgs?: Set<number>): TrigIdentityResult {
   try {
     const trimmed = input.trim();
     if (!trimmed) throw new TrigIdentityError("נא להזין ביטוי טריגונומטרי, למשל (1-cos(2x))/sin(2x)");
     if (trimmed.includes("=")) throw new TrigIdentityError("נא להזין ביטוי לפישוט (ללא סימן =)");
 
     const atoms: AtomMap = new Map();
-    let current = ratReduce(parseRationalExpr(trimmed, atoms));
+    let current: Rational;
+    try {
+      current = ratReduce(parseRationalExpr(trimmed, atoms));
+    } catch (err) {
+      const msg = err instanceof TrigIdentityError ? err.message : "לא הצלחתי לפענח את הביטוי";
+      return { type: "error", message: msg, hint: PARSE_HINT };
+    }
     const originalStr = formatRational(current);
     const steps: TrigIdentityStep[] = [];
-    let score = complexityScore(current);
+    let score = scoreVector(current, atoms, targetArgs);
 
     for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
-      const collapsedNum = tryPythagoreanCollapse(current.num, atoms) ?? trySumDifferenceCollapse(current.num, atoms);
+      const collapsedNum = tryPythagoreanCollapse(current.num, atoms) ?? trySumDifferenceCollapse(current.num, atoms) ?? tryDoubleAngleProductCollapse(current.num, atoms);
       if (collapsedNum) {
         current = ratReduce({ num: collapsedNum, den: current.den });
-        score = complexityScore(current);
+        score = scoreVector(current, atoms, targetArgs);
         steps.push({
           law: "צמצום ישיר",
           expr: formatRational(current),
@@ -696,10 +863,10 @@ export function simplifyTrigExpression(input: string): TrigIdentityResult {
         });
         continue;
       }
-      const collapsedDen = tryPythagoreanCollapse(current.den, atoms) ?? trySumDifferenceCollapse(current.den, atoms);
+      const collapsedDen = tryPythagoreanCollapse(current.den, atoms) ?? trySumDifferenceCollapse(current.den, atoms) ?? tryDoubleAngleProductCollapse(current.den, atoms);
       if (collapsedDen) {
         current = ratReduce({ num: current.num, den: collapsedDen });
-        score = complexityScore(current);
+        score = scoreVector(current, atoms, targetArgs);
         steps.push({
           law: "צמצום ישיר",
           expr: formatRational(current),
@@ -712,13 +879,20 @@ export function simplifyTrigExpression(input: string): TrigIdentityResult {
         ...generateCandidatesForSide(current, atoms, "num"),
         ...generateCandidatesForSide(current, atoms, "den"),
       ];
-      let best: { candidate: Candidate; s: number } | null = null;
+      let best: { candidate: Candidate; rational: Rational; s: ScoreVec } | null = null;
       for (const cand of candidates) {
-        const s = complexityScore(cand.rational);
-        if (s < score && (!best || s < best.s)) best = { candidate: cand, s };
+        // Score the candidate on its state after any immediately-available collapse, not
+        // its raw post-substitution form — this is what lets a substitution that unlocks a
+        // Pythagorean/sum-difference collapse win, while one that just shuffles atoms
+        // around without unlocking anything (and inflates the term count) loses.
+        const collapsed = collapseFully(cand.rational, atoms);
+        const s = scoreVector(collapsed, atoms, targetArgs);
+        if (compareScore(s, score) < 0 && (!best || compareScore(s, best.s) < 0)) {
+          best = { candidate: cand, rational: collapsed, s };
+        }
       }
       if (!best) break;
-      current = best.candidate.rational;
+      current = best.rational;
       score = best.s;
       steps.push({ law: best.candidate.ruleName, expr: formatRational(current), explanation: best.candidate.explanation });
     }

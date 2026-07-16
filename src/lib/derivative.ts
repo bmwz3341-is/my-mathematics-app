@@ -38,13 +38,16 @@ export function detectVariable(input: string): string {
   return match ? match[0].toLowerCase() : "x";
 }
 
-/** Splits on top-level +/- (not the sign inside an exponent like x^-2). */
+/** Splits on top-level +/- (not the sign inside an exponent like x^-2, and not inside parens). */
 function splitTerms(expr: string): string[] {
   const terms: string[] = [];
   let current = "";
+  let depth = 0;
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
-    if ((ch === "+" || ch === "-") && current !== "" && expr[i - 1] !== "^") {
+    if (ch === "(") depth++;
+    else if (ch === ")") depth--;
+    if (depth === 0 && (ch === "+" || ch === "-") && current !== "" && expr[i - 1] !== "^") {
       terms.push(current);
       current = ch;
     } else {
@@ -54,6 +57,14 @@ function splitTerms(expr: string): string[] {
   if (current) terms.push(current);
   return terms.filter((t) => t.trim() !== "");
 }
+
+/**
+ * Shown when a term contains "/" but isn't a plain numeric denominator (e.g. "(x+1)/(x-2)"
+ * or "1/x") — this engine is monomial-only and has no quotient rule yet. Surfaced as a
+ * clean, honest result rather than a raw parse error, so fraction input is always accepted
+ * at the field level even where the engine can't solve it yet.
+ */
+const UNSUPPORTED_QUOTIENT_MESSAGE = "הפונקציה שציינת (מנה) טרם נתמכת בגרסת האלגברה הנוכחית";
 
 function parseTerm(raw: string, variable: string): Term {
   let s = raw.replace(/\s+/g, "");
@@ -67,20 +78,26 @@ function parseTerm(raw: string, variable: string): Term {
   if (s === "") throw new DerivativeError(`איבר לא תקין: "${raw}"`);
 
   const varLetter = variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp(`^(\\d+(?:\\.\\d+)?)?(${varLetter})?(?:\\^([+-]?\\d+))?$`, "i");
+  const re = new RegExp(`^(\\d+(?:\\.\\d+)?)?(${varLetter})?(?:\\^([+-]?\\d+))?(?:\\/(\\d+(?:\\.\\d+)?))?$`, "i");
   const match = s.match(re);
   if (!match || (!match[1] && !match[2])) {
+    if (s.includes("/")) throw new DerivativeError(UNSUPPORTED_QUOTIENT_MESSAGE);
     if (/[a-zA-Z]/.test(s)) throw new DerivativeError("נתמך משתנה יחיד בלבד (למשל x)");
     throw new DerivativeError(`איבר לא תקין: "${raw}"`);
   }
-  const [, coefStr, varPart, powStr] = match;
+  const [, coefStr, varPart, powStr, denomStr] = match;
+  let denom = 1;
+  if (denomStr) {
+    denom = parseFloat(denomStr);
+    if (!Number.isFinite(denom) || denom === 0) throw new DerivativeError(`מכנה לא תקין באיבר: "${raw}"`);
+  }
   if (!varPart) {
-    return { coefficient: sign * parseFloat(coefStr!), power: 0 };
+    return { coefficient: (sign * parseFloat(coefStr!)) / denom, power: 0 };
   }
   const coefficient = coefStr ? parseFloat(coefStr) : 1;
   const power = powStr !== undefined ? parseInt(powStr, 10) : 1;
   if (!Number.isInteger(power)) throw new DerivativeError("נתמכות רק חזקות שלמות");
-  return { coefficient: sign * coefficient, power };
+  return { coefficient: (sign * coefficient) / denom, power };
 }
 
 function combineLikeTerms(terms: Term[]): Term[] {

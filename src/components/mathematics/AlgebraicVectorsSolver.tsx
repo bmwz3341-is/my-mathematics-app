@@ -102,7 +102,7 @@ export default function AlgebraicVectorsSolver() {
         <p className="text-right text-xs font-bold text-slate-600">
           וקטור <bdi dir="ltr">{name} = [x, y, z]</bdi>
         </p>
-        <div className="mt-1 grid grid-cols-3 gap-3">
+        <div dir="ltr" className="mt-1 grid grid-cols-3 gap-3">
           {AXES.map((axis, i) => (
             <div key={axis}>
               <label htmlFor={`vec-${name}-${axis}`} className="block text-right text-xs font-bold text-slate-600">
