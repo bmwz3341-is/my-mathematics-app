@@ -1,0 +1,92 @@
+[
+  {
+    "id": "linear-basics-1",
+    "title": "משוואות לינאריות – יסודות",
+    "subject": "linearEquations",
+    "difficulty": "easy",
+    "questions": [
+      { "id": "q1", "expression": "2x + 3 = 7", "expectedAnswer": "2" },
+      { "id": "q2", "expression": "4x - 5 = 11", "expectedAnswer": "4" },
+      { "id": "q3", "expression": "3*(x + 2) = 21", "expectedAnswer": "5" },
+      { "id": "q4", "expression": "5x - 1 = 3x + 9", "expectedAnswer": "5" }
+    ]
+  },
+  {
+    "id": "quadratic-basics-1",
+    "title": "משוואות ריבועיות – יסודות",
+    "subject": "quadraticEquations",
+    "difficulty": "medium",
+    "questions": [
+      { "id": "q1", "expression": "x^2 - 5x + 6 = 0", "expectedAnswer": "2, 3" },
+      { "id": "q2", "expression": "x^2 - 4 = 0", "expectedAnswer": "-2, 2" },
+      { "id": "q3", "expression": "x^2 + 2x + 1 = 0", "expectedAnswer": "-1" },
+      { "id": "q4", "expression": "x^2 + 4 = 0", "expectedAnswer": "אין פתרון ממשי" }
+    ]
+  },
+  {
+    "id": "powers-basics-1",
+    "title": "חוקי חזקות – יסודות",
+    "subject": "powersAlgebra",
+    "difficulty": "easy",
+    "questions": [
+      { "id": "q1", "expression": "x^2 * x^3", "expectedAnswer": "x^5" },
+      { "id": "q2", "expression": "(x^2)^3", "expectedAnswer": "x^6" },
+      { "id": "q3", "expression": "x^5 / x^2", "expectedAnswer": "x^3" }
+    ]
+  },
+  {
+    "id": "log-basics-1",
+    "title": "משוואות לוגריתמיות – יסודות",
+    "subject": "logarithmicEquations",
+    "difficulty": "medium",
+    "questions": [
+      { "id": "q1", "expression": "log_2(x+3) + log_2(x-3) = 4", "expectedAnswer": "5" },
+      { "id": "q2", "expression": "ln(x) + ln(x-2) = ln(3)", "expectedAnswer": "3" },
+      { "id": "q3", "expression": "log(x+2) - log(x-1) = 1", "expectedAnswer": "4/3" }
+    ]
+  },
+  {
+    "id": "derivative-basics-1",
+    "title": "חקירת פונקציות – גזירה",
+    "subject": "functionAnalysis",
+    "difficulty": "medium",
+    "questions": [
+      { "id": "q1", "expression": "x^3 - 3x^2", "expectedAnswer": "3x^2 - 6x" },
+      { "id": "q2", "expression": "x^3 - 3x + 1", "expectedAnswer": "3x^2 - 3" },
+      { "id": "q3", "expression": "x^4 - 4x^2", "expectedAnswer": "4x^3 - 8x" },
+      { "id": "q4", "expression": "-x^2 + 4x", "expectedAnswer": "-2x + 4" }
+    ]
+  },
+  {
+    "id": "circle-basics-1",
+    "title": "מעגלים – מרכז ורדיוס",
+    "subject": "circleGeometry",
+    "difficulty": "medium",
+    "questions": [
+      { "id": "q1", "expression": "x^2+y^2-4x+6y-3=0", "expectedAnswer": "2, -3, 4" },
+      { "id": "q2", "expression": "x^2+y^2-9=0", "expectedAnswer": "0, 0, 3" },
+      { "id": "q3", "expression": "x^2+(y-3)^2=25", "expectedAnswer": "0, 3, 5" }
+    ]
+  },
+  {
+    "id": "system2-basics-1",
+    "title": "מערכת 2 נעלמים – יסודות",
+    "subject": "systemOfEquations",
+    "difficulty": "medium",
+    "questions": [
+      { "id": "q1", "expression": "x + y = 5 | 2x - y = 1", "expectedAnswer": "x=2, y=3" },
+      { "id": "q2", "expression": "2x + 3y = 12 | x - y = 1", "expectedAnswer": "x=3, y=2" },
+      { "id": "q3", "expression": "x - y = 2 | x + y = 8", "expectedAnswer": "x=5, y=3" }
+    ]
+  },
+  {
+    "id": "system3-basics-1",
+    "title": "מערכת 3 נעלמים – יסודות",
+    "subject": "systemOf3Equations",
+    "difficulty": "hard",
+    "questions": [
+      { "id": "q1", "expression": "x + y + z = 6 | 2x - y + z = 3 | x + 2y - z = 2", "expectedAnswer": "x=1, y=2, z=3" },
+      { "id": "q2", "expression": "x + y + z = 6 | x - y + z = 0 | x + y - z = 2", "expectedAnswer": "x=1, y=3, z=2" }
+    ]
+  }
+]

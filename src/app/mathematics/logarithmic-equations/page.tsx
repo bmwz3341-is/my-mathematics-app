@@ -20,9 +20,9 @@ export default function LogarithmicEquationsPage() {
       <div className="pointer-events-none absolute -bottom-24 -right-24 size-80 rounded-full bg-cyan-200/40 blur-3xl" />
 
       <div className="relative">
-        <h1 className="text-right text-2xl font-extrabold text-orange-500 sm:text-3xl">משוואות לוגריתמיות</h1>
+        <h1 className="text-right text-2xl font-extrabold text-orange-500 sm:text-3xl">פונקציות מעריכיות ולוגריתמים</h1>
         <p className="mt-4 text-right text-sm font-medium text-slate-600">
-          הזינו משוואה לוגריתמית (log_a או ln) וקבלו פתרון מדויק שלב אחר שלב, כולל בדיקת תחום הגדרה
+          משוואות לוגריתמיות, משוואות מעריכיות (a^f(x) = b^g(x)) וגדילה/דעיכה — פתרון מדויק שלב אחר שלב
         </p>
 
         <div className="mt-6">

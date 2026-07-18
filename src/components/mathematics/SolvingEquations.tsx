@@ -6,6 +6,7 @@ import { solveMathInput, symLinearToNumeric, type SolveResult } from "@/lib/equa
 import EquationGraph from "@/components/mathematics/EquationGraph";
 import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 const EXAMPLES = [
   "2x + 3 = 7",
@@ -30,9 +31,12 @@ function subscript(n: number): string {
 export default function SolvingEquations() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<SolveResult | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve() {
-    setResult(solveMathInput(input));
+    const r = solveMathInput(input);
+    setResult(r);
+    if (r.type !== "error") track("linearEquations", input);
   }
 
   function handleExample(example: string) {

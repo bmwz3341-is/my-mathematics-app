@@ -40,7 +40,13 @@ function formatNumber(n: number): string {
   return rounded.toLocaleString("en-US", { maximumFractionDigits: 4 });
 }
 
-export default function TrigLawsSolver({ initialLaw = "sines" }: { initialLaw?: LawMode }) {
+export default function TrigLawsSolver({
+  initialLaw = "sines",
+  onLawChange,
+}: {
+  initialLaw?: LawMode;
+  onLawChange?: (law: LawMode) => void;
+}) {
   const [mode, setMode] = useState<LawMode>(initialLaw);
   const [form, setForm] = useState<Record<keyof TriangleInput, string>>(EMPTY_FORM);
   const [result, setResult] = useState<TriangleResult | null>(null);
@@ -80,6 +86,7 @@ export default function TrigLawsSolver({ initialLaw = "sines" }: { initialLaw?: 
   function handleModeChange(m: LawMode) {
     setMode(m);
     setResult(null);
+    onLawChange?.(m);
   }
 
   return (

@@ -11,7 +11,6 @@ import {
   Shuffle,
   X,
   Triangle,
-  Compass,
   Ruler,
   Equal,
   SquareFunction,
@@ -32,9 +31,8 @@ interface TopicCard {
 }
 
 const TRIGOGEO_CARDS: TopicCard[] = [
-  { id: "lawOfSines", label: "משפט הסינוסים", href: "/mathematics/trig-rules?law=sines", icon: Triangle, badge: "sin" },
-  { id: "lawOfCosines", label: "משפט הקוסינוסים", href: "/mathematics/trig-rules?law=cosines", icon: Compass, badge: "cos" },
-  { id: "triangleArea", label: "שטח משולש (½ab·sinC)", href: "/mathematics/triangle-area", icon: Ruler, badge: "S" },
+  { id: "trigLaws", label: "משפטי הסינוסים והקוסינוסים", href: "/mathematics/trig-rules", icon: Triangle, badge: "sin/cos" },
+  { id: "triangleArea", label: "מחשבון שטחי מצולעים", href: "/mathematics/triangle-area", icon: Ruler, badge: "S" },
   { id: "trigIdentities", label: "זהויות טריגונומטריות", href: "/mathematics/trig-identities", icon: Equal, badge: "≡" },
   { id: "trigEquations", label: "משוואות טריגונומטריות", href: "/mathematics/trig-equations", icon: SquareFunction, badge: "=0" },
   { id: "unitCircleRadians", label: "מעגל היחידה ורדיאנים", href: "/mathematics/unit-circle-radians", icon: CircleDot, badge: "rad" },
@@ -73,7 +71,7 @@ export default function TrigoGeoPage() {
         <div className="flex items-start justify-between gap-3">
           <div className="text-right">
             <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">טריגונומטריה והנדסה</h1>
-            <p className="mt-1 text-sm font-bold text-black">פתרון תרגילים — 9 נושאים ל-5 יחידות</p>
+            <p className="mt-1 text-sm font-bold text-black">פתרון תרגילים — 8 נושאים ל-5 יחידות</p>
           </div>
           <Link
             href="/space-geometry"

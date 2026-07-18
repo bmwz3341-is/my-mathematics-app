@@ -6,15 +6,19 @@ import { solveQuadratic, type QuadraticResult } from "@/lib/quadraticSolver";
 import QuadraticGraph from "@/components/mathematics/QuadraticGraph";
 import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 const EXAMPLES = ["x^2 - 5x + 6 = 0", "x^2 + 5x = -6", "x^2 - 4x + 4 = 0", "x^2 + 2x + 5 = 0", "2x^2 - 8 = 0"];
 
 export default function QuadraticEquationSolver() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<QuadraticResult | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve() {
-    setResult(solveQuadratic(input));
+    const r = solveQuadratic(input);
+    setResult(r);
+    if (r.type === "result") track("quadraticEquations", input);
   }
 
   function handleExample(example: string) {

@@ -4,10 +4,11 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
-import { ArrowRight, Camera, Search, Shuffle, X } from "lucide-react";
+import { ArrowRight, Search, Shuffle, X } from "lucide-react";
 import { mathItems, type MathItem } from "@/config/mathematicsData";
 import { generateDailyChallenge } from "@/config/challenges";
 import { setPendingChallenge } from "@/lib/dailyChallengeSession";
+import Dashboard from "@/components/mathematics/Dashboard";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
@@ -22,6 +23,8 @@ const ALGEBRA_TRACK_IDS = [
   "quadraticEquations",
   "systemOf3Equations",
   "integralCalculator",
+  "complexNumbers",
+  "circleGeometry",
 ];
 
 export default function MathematicsPage() {
@@ -147,14 +150,7 @@ export default function MathematicsPage() {
           )}
         </div>
 
-        <div className="mt-6 flex items-center justify-between gap-3 rounded-xl border border-white/40 bg-white/20 px-4 py-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-black/70">
-            <Camera className="size-4 text-white" strokeWidth={2} />
-          </span>
-          <p className="text-right text-sm text-slate-800">
-            <span className="font-bold">טיפ:</span> לא בטוח מה לבחור? צלם את התרגיל והמערכת תזהה עבורך.
-          </p>
-        </div>
+        <Dashboard />
       </div>
     </div>
   );

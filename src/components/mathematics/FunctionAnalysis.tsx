@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 import { ChartLine, Crosshair } from "lucide-react";
-import { differentiate, type DerivativeResult } from "@/lib/derivative";
-import { findExtrema, type FunctionAnalysisResult, type CriticalPoint } from "@/lib/functionAnalysis";
+import {
+  differentiateExpr,
+  findExtrema,
+  type DerivativeResult,
+  type FunctionAnalysisResult,
+  type CriticalPoint,
+} from "@/lib/functionAnalysis";
+import type { Sym } from "@/lib/symbolicAlgebra";
+import { saveRecentExercise } from "@/lib/activityTracker";
 import DerivativeGraph from "@/components/mathematics/DerivativeGraph";
 import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
@@ -19,25 +26,33 @@ function kindLabel(kind: CriticalPoint["kind"]): string {
   return kind === "max" ? "נקודת מקסימום" : kind === "min" ? "נקודת מינימום" : "לא ניתן לקבוע";
 }
 
+/** Converts a single-variable Sym into the {coefficient,power}[] shape DerivativeGraph
+ * expects, structurally matching derivative.ts's `Term` without importing that module. */
+function symToPlotTerms(sym: Sym, variable: string): { coefficient: number; power: number }[] {
+  return sym.map((t) => ({ coefficient: t.coeff, power: t.vars[variable] ?? 0 }));
+}
+
 export default function FunctionAnalysis() {
   const [input, setInput] = useState("");
   const [derivativeResult, setDerivativeResult] = useState<DerivativeResult | null>(null);
   const [analysisResult, setAnalysisResult] = useState<FunctionAnalysisResult | null>(null);
 
   function handleSolve() {
-    setDerivativeResult(differentiate(input));
+    const result = differentiateExpr(input);
+    setDerivativeResult(result);
     setAnalysisResult(null);
+    if (result.type === "result") saveRecentExercise("functionAnalysis", input);
   }
 
   function handleExample(example: string) {
     setInput(example);
-    setDerivativeResult(differentiate(example));
+    setDerivativeResult(differentiateExpr(example));
     setAnalysisResult(null);
   }
 
   function handleFindExtrema() {
     if (derivativeResult?.type !== "result") return;
-    setAnalysisResult(findExtrema(derivativeResult.originalTerms, derivativeResult.variable));
+    setAnalysisResult(findExtrema(derivativeResult.originalSym, derivativeResult.variable));
   }
 
   const dailyChallengeActive = useDailyChallengeAutoFill("functionAnalysis", (challenge) => {
@@ -178,8 +193,8 @@ export default function FunctionAnalysis() {
           )}
 
           <DerivativeGraph
-            originalTerms={derivativeResult.originalTerms}
-            derivativeTerms={derivativeResult.derivativeTerms}
+            originalTerms={symToPlotTerms(derivativeResult.originalSym, derivativeResult.variable)}
+            derivativeTerms={symToPlotTerms(derivativeResult.derivativeSym, derivativeResult.variable)}
             originalExpr={derivativeResult.originalExpr}
             derivativeExpr={derivativeResult.derivativeExpr}
             variable={derivativeResult.variable}

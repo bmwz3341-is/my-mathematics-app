@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { Heebo } from "next/font/google";
 import { ArrowRight } from "lucide-react";
-import PolygonAreaSolver from "@/components/mathematics/PolygonAreaSolver";
+import CircleGeometry from "@/components/mathematics/CircleGeometry";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
-export default function TriangleAreaPage() {
+export default function CircleGeometryPage() {
   return (
     <div
       dir="rtl"
@@ -20,18 +20,18 @@ export default function TriangleAreaPage() {
       <div className="pointer-events-none absolute -bottom-24 -right-24 size-80 rounded-full bg-cyan-200/40 blur-3xl" />
 
       <div className="relative">
-        <h1 className="text-right text-2xl font-extrabold text-sky-700 sm:text-3xl">מחשבון שטחי מצולעים</h1>
+        <h1 className="text-right text-2xl font-extrabold text-orange-500 sm:text-3xl">מעגל ומשיקים</h1>
         <p className="mt-4 text-right text-sm font-medium text-slate-600">
-          בחרו צורה ושיטת חישוב, הזינו את הנתונים הידועים, וקבלו פתרון שלב אחר שלב
+          זיהוי מרכז ורדיוס ממשוואה כללית או קנונית, ומציאת משוואת המשיק למעגל בנקודה נתונה — עם פתרון שלב אחר שלב
         </p>
 
         <div className="mt-6">
-          <PolygonAreaSolver />
+          <CircleGeometry />
         </div>
       </div>
 
       <Link
-        href="/TrigoGeo"
+        href="/mathematics"
         aria-label="חזרה למסך הקודם"
         className="fixed bottom-6 right-6 flex size-14 items-center justify-center rounded-full border border-white/60 bg-white/40 text-[#2F6FED] shadow-[0_0_18px_rgba(47,111,237,0.4)] backdrop-blur-xl backdrop-saturate-150 transition hover:bg-white/60 active:scale-95"
       >

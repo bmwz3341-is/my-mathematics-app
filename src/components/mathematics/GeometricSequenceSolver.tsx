@@ -11,6 +11,7 @@ import {
 } from "@/lib/geometricSequence";
 import SequenceTermsGraph from "@/components/mathematics/SequenceTermsGraph";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 interface FieldDef {
   key: keyof GeoSequenceInput;
@@ -96,6 +97,7 @@ export default function GeometricSequenceSolver() {
   const [form, setForm] = useState<Record<keyof GeoSequenceInput, string>>(EMPTY_FORM);
   const [findN, setFindN] = useState("");
   const [result, setResult] = useState<GeoSequenceParamResult | null>(null);
+  const track = useTrackExercise();
 
   useDailyChallengeAutoFill("geometricSequences", (challenge) => {
     const values = { ...EMPTY_FORM, ...(challenge.params ?? {}) } as Record<keyof GeoSequenceInput, string>;
@@ -103,26 +105,33 @@ export default function GeometricSequenceSolver() {
     solveWith(values);
   });
 
-  function solveWith(values: Record<keyof GeoSequenceInput, string>) {
+  function solveWith(values: Record<keyof GeoSequenceInput, string>): GeoSequenceParamResult {
     let findIndex: number | undefined;
     const rawFindN = findN.trim();
     if (rawFindN !== "") {
       findIndex = parseFloat(rawFindN);
       if (!Number.isFinite(findIndex)) {
-        setResult({ type: "error", message: "הערך בשדה 'מצא איבר n' אינו מספר תקין" });
-        return;
+        const r: GeoSequenceParamResult = { type: "error", message: "הערך בשדה 'מצא איבר n' אינו מספר תקין" };
+        setResult(r);
+        return r;
       }
     }
-    setResult(
-      solveGeoSequenceFromText(
-        { a1: values.a1, q: values.q, n: values.n, an: values.an, Sn: values.Sn },
-        findIndex,
-      ),
+    const r = solveGeoSequenceFromText(
+      { a1: values.a1, q: values.q, n: values.n, an: values.an, Sn: values.Sn },
+      findIndex,
     );
+    setResult(r);
+    return r;
   }
 
   function handleSolve() {
-    solveWith(form);
+    const r = solveWith(form);
+    if (r.type !== "error") {
+      const summary = FIELDS.filter((f) => form[f.key].trim() !== "")
+        .map((f) => `${f.key}=${form[f.key]}`)
+        .join(", ");
+      track("geometricSequences", summary);
+    }
   }
 
   function handleExample(example: Example) {

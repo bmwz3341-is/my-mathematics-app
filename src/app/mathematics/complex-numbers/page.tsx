@@ -32,7 +32,7 @@ export default function ComplexNumbersPage() {
       </div>
 
       <Link
-        href="/space-geometry"
+        href="/mathematics"
         aria-label="חזרה למסך הקודם"
         className="fixed bottom-6 right-6 flex size-14 items-center justify-center rounded-full border border-white/60 bg-white/40 text-[#2F6FED] shadow-[0_0_18px_rgba(47,111,237,0.4)] backdrop-blur-xl backdrop-saturate-150 transition hover:bg-white/60 active:scale-95"
       >

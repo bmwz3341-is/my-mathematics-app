@@ -1,0 +1,202 @@
+"use client";
+
+import { evalTerms, type Term } from "@/lib/integral";
+
+const F_COLOR = "#2F6FED";
+const G_COLOR = "#dc2626";
+const AREA_FILL = "rgba(139,92,246,0.35)";
+const AREA_STROKE = "#7c3aed";
+
+function formatNumber(n: number): string {
+  const rounded = Math.round(n * 1e4) / 1e4;
+  return rounded.toLocaleString("en-US", { maximumFractionDigits: 4 });
+}
+
+function niceStep(range: number): number {
+  const raw = range / 5;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  for (const m of [1, 2, 5, 10]) {
+    if (raw <= m * mag) return m * mag;
+  }
+  return 10 * mag;
+}
+
+function ticks(min: number, max: number): number[] {
+  const step = niceStep(max - min);
+  const out: number[] = [];
+  for (let v = Math.ceil(min / step) * step; v <= max + 1e-9; v += step) {
+    const val = Math.abs(v) < 1e-9 ? 0 : v;
+    if (val === 0) continue;
+    out.push(val);
+  }
+  return out;
+}
+
+function baseDomain(terms: Term[]): number {
+  const hasExp = terms.some((t) => t.kind === "exp");
+  const hasTrig = terms.some((t) => t.kind === "sin" || t.kind === "cos");
+  const maxPower = terms.reduce((m, t) => (t.kind === "power" ? Math.max(m, t.power ?? 0) : m), 0);
+  let d = 4;
+  if (maxPower >= 4) d = 3;
+  else if (maxPower === 3) d = 4.5;
+  else if (maxPower <= 1) d = 6;
+  if (hasTrig) d = Math.max(d, 6.5);
+  if (hasExp) d = Math.min(d, 4);
+  return d;
+}
+
+interface AreaBetweenGraphProps {
+  fTerms: Term[];
+  gTerms: Term[];
+  variable: string;
+  fExpr: string;
+  gExpr: string;
+  roots: number[];
+  totalArea: number;
+}
+
+export default function AreaBetweenGraph({ fTerms, gTerms, variable, fExpr, gExpr, roots, totalArea }: AreaBetweenGraphProps) {
+  const lo = roots[0];
+  const hi = roots[roots.length - 1];
+
+  let range = Math.max(baseDomain(fTerms), baseDomain(gTerms));
+  range = Math.max(range, Math.abs(lo) * 1.3, Math.abs(hi) * 1.3, 1);
+  const xMin = -range;
+  const xMax = range;
+
+  const W = 340;
+  const H = 260;
+  const P = 36;
+  const SAMPLES = 160;
+
+  function samplePoints(terms: Term[]) {
+    const pts: { x: number; y: number }[] = [];
+    for (let i = 0; i <= SAMPLES; i++) {
+      const x = xMin + ((xMax - xMin) * i) / SAMPLES;
+      const y = evalTerms(terms, x);
+      if (Number.isFinite(y)) pts.push({ x, y });
+    }
+    return pts;
+  }
+  const fPoints = samplePoints(fTerms);
+  const gPoints = samplePoints(gTerms);
+
+  const AREA_SAMPLES = 80;
+  const areaXs: number[] = [];
+  for (let i = 0; i <= AREA_SAMPLES; i++) areaXs.push(lo + ((hi - lo) * i) / AREA_SAMPLES);
+  const areaFPoints = areaXs.map((x) => ({ x, y: evalTerms(fTerms, x) }));
+  const areaGPoints = areaXs.map((x) => ({ x, y: evalTerms(gTerms, x) }));
+
+  // Scale the y-axis to the shaded area itself (x within [lo, hi]), not the full curve's
+  // domain — a higher-degree curve can already be far larger just outside the shaded
+  // region, which would otherwise squash the area down to an invisible sliver. The curves
+  // still render across the full width; they're just allowed to run off-scale outside
+  // [lo, hi], same as any function graph does past its window of interest.
+  const ys = [...areaFPoints.map((p) => p.y), ...areaGPoints.map((p) => p.y), 0].filter((v) => Number.isFinite(v));
+  let yMin = Math.min(...ys);
+  let yMax = Math.max(...ys);
+  if (yMax - yMin < 1e-6) {
+    yMin -= 1;
+    yMax += 1;
+  }
+  const padY = (yMax - yMin) * 0.15;
+  yMin -= padY;
+  yMax += padY;
+
+  const sx = (v: number) => P + ((v - xMin) / (xMax - xMin)) * (W - 2 * P);
+  const sy = (v: number) => H - P - ((v - yMin) / (yMax - yMin)) * (H - 2 * P);
+
+  const fPath = fPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${sx(p.x).toFixed(1)} ${sy(p.y).toFixed(1)}`).join(" ");
+  const gPath = gPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${sx(p.x).toFixed(1)} ${sy(p.y).toFixed(1)}`).join(" ");
+
+  const areaPath = [
+    `M ${sx(areaFPoints[0].x).toFixed(1)} ${sy(areaFPoints[0].y).toFixed(1)}`,
+    ...areaFPoints.slice(1).map((p) => `L ${sx(p.x).toFixed(1)} ${sy(p.y).toFixed(1)}`),
+    ...[...areaGPoints].reverse().map((p) => `L ${sx(p.x).toFixed(1)} ${sy(p.y).toFixed(1)}`),
+    "Z",
+  ].join(" ");
+
+  return (
+    <div className="mt-3 rounded-xl border border-white/60 bg-white/40 px-4 py-4">
+      <p className="text-right text-sm font-extrabold text-black">הצגה גרפית:</p>
+
+      <div dir="ltr" className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+        <span className="flex items-center gap-1.5">
+          <span className="h-0.5 w-5 rounded-full" style={{ backgroundColor: F_COLOR }} />
+          <span className="font-mono text-xs font-bold text-slate-700">
+            f({variable}) = {fExpr}
+          </span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-0.5 w-5 rounded-full" style={{ backgroundColor: G_COLOR }} />
+          <span className="font-mono text-xs font-bold text-slate-700">
+            g({variable}) = {gExpr}
+          </span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="size-2.5 rounded-sm" style={{ backgroundColor: AREA_FILL }} />
+          <span className="font-mono text-xs font-bold text-slate-700">שטח חסום</span>
+        </span>
+      </div>
+
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-label={`גרפים של f(${variable})=${fExpr} ו-g(${variable})=${gExpr}, עם השטח החסום ביניהן`}
+        className="mx-auto mt-2 w-full max-w-sm"
+        style={{ direction: "ltr" }}
+      >
+        <defs>
+          <clipPath id="area-between-clip">
+            <rect x={P} y={P} width={W - 2 * P} height={H - 2 * P} />
+          </clipPath>
+        </defs>
+
+        <line x1={P - 6} y1={sy(0)} x2={W - P + 6} y2={sy(0)} stroke="#94a3b8" strokeWidth="1" />
+        <line x1={sx(0)} y1={P - 6} x2={sx(0)} y2={H - P + 6} stroke="#94a3b8" strokeWidth="1" />
+        <text x={W - P + 10} y={sy(0) + 4} fontSize="11" fontWeight="700" fill="#64748b">
+          x
+        </text>
+        <text x={sx(0) - 4} y={P - 10} fontSize="11" fontWeight="700" fill="#64748b" textAnchor="end">
+          y
+        </text>
+
+        {ticks(xMin, xMax).map((v) => (
+          <g key={`tx-${v}`}>
+            <line x1={sx(v)} y1={sy(0) - 3} x2={sx(v)} y2={sy(0) + 3} stroke="#94a3b8" strokeWidth="1" />
+            <text x={sx(v)} y={sy(0) + 14} fontSize="9" fill="#64748b" textAnchor="middle">
+              {formatNumber(v)}
+            </text>
+          </g>
+        ))}
+        {ticks(yMin, yMax).map((v) => (
+          <g key={`ty-${v}`}>
+            <line x1={sx(0) - 3} y1={sy(v)} x2={sx(0) + 3} y2={sy(v)} stroke="#94a3b8" strokeWidth="1" />
+            <text x={sx(0) - 5} y={sy(v) + 3} fontSize="9" fill="#64748b" textAnchor="end">
+              {formatNumber(v)}
+            </text>
+          </g>
+        ))}
+
+        <g clipPath="url(#area-between-clip)">
+          <path d={areaPath} fill={AREA_FILL} stroke={AREA_STROKE} strokeWidth="1" />
+          <path d={fPath} fill="none" stroke={F_COLOR} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={gPath} fill="none" stroke={G_COLOR} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          {roots.map((r, i) => (
+            <line key={i} x1={sx(r)} y1={sy(0)} x2={sx(r)} y2={sy(evalTerms(fTerms, r))} stroke={AREA_STROKE} strokeWidth="1.5" strokeDasharray="3 3" />
+          ))}
+        </g>
+
+        {roots.map((r, i) => (
+          <text key={i} x={sx(r)} y={H - P + 14} fontSize="9" fontWeight="800" fill={AREA_STROKE} textAnchor="middle">
+            {formatNumber(r)}
+          </text>
+        ))}
+      </svg>
+
+      <p className="mt-2 text-right text-xs font-medium leading-relaxed text-slate-700">
+        השטח הצבוע בסגול מייצג את האזור החסום בין שני הגרפים בין x={formatNumber(lo)} ל-x={formatNumber(hi)}, ששווה ל-{formatNumber(totalArea)}.
+      </p>
+    </div>
+  );
+}

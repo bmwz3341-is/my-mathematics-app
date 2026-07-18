@@ -6,6 +6,7 @@ import { solveSystem, type SystemMethod, type SystemResult } from "@/lib/systemO
 import SystemOfEquationsGraph from "@/components/mathematics/SystemOfEquationsGraph";
 import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 const EXAMPLES: { eq1: string; eq2: string }[] = [
   { eq1: "x + y = 5", eq2: "2x - y = 1" },
@@ -29,9 +30,12 @@ export default function SystemOfEquationsSolver() {
   const [eq2Input, setEq2Input] = useState("");
   const [method, setMethod] = useState<SystemMethod>("elimination");
   const [result, setResult] = useState<SystemResult | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve(e1 = eq1Input, e2 = eq2Input, m = method) {
-    setResult(solveSystem(e1, e2, m));
+    const r = solveSystem(e1, e2, m);
+    setResult(r);
+    if (r.type !== "error") track("systemOfEquations", `${e1} | ${e2}`);
   }
 
   function handleExample(example: { eq1: string; eq2: string }) {

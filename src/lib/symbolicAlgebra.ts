@@ -285,6 +285,28 @@ export function evalSymSingleVar(sym: Sym, variable: string, value: number): num
   }, 0);
 }
 
+/**
+ * Symbolic derivative of `sym` with respect to `variable`, via the power rule
+ * applied monomial-by-monomial (the sum/difference rule falls out for free by
+ * iterating every term independently). Any other letter inside a monomial —
+ * a parameter such as `a` or `k` — is left untouched, exactly like a numeric
+ * coefficient would be: d/dx(a*x^3) = 3a*x^2, d/dx(a) = 0. Because `sym` may
+ * come from a fully expanded product (e.g. "(x-2)(x+2)^3"), this also covers
+ * factored input the old monomial-only engine in derivative.ts could not parse.
+ */
+export function differentiateSym(sym: Sym, variable: string): Sym {
+  let result: Sym = [];
+  for (const term of sym) {
+    const power = term.vars[variable] ?? 0;
+    if (power === 0) continue; // constant w.r.t. `variable` — derivative is 0
+    const vars: Record<string, number> = { ...term.vars };
+    if (power === 1) delete vars[variable];
+    else vars[variable] = power - 1;
+    result = symAdd(result, [{ vars, coeff: term.coeff * power }]);
+  }
+  return result;
+}
+
 /* ------------------------------------------------------------------ */
 /* Tokenizer & parser for algebraic expressions (numbers + letters).   */
 /* ------------------------------------------------------------------ */
@@ -378,14 +400,6 @@ export function parseExpr(tokens: Token[]): Sym {
       consume();
       return symParam(t.name);
     }
-    if (t.type === "op" && t.value === "-") {
-      consume();
-      return symNeg(parsePrimary());
-    }
-    if (t.type === "op" && t.value === "+") {
-      consume();
-      return parsePrimary();
-    }
     if (t.type === "lparen") {
       consume();
       const value = parseAddSub();
@@ -401,21 +415,36 @@ export function parseExpr(tokens: Token[]): Sym {
     const t = peek();
     if (t && t.type === "op" && t.value === "^") {
       consume();
-      return power(base, parsePower());
+      return power(base, parseUnary());
     }
     return base;
   }
 
+  /** Unary +/- sits *above* `^` in precedence (like standard math notation): "-x^2" is
+   * "-(x^2)", not "(-x)^2" — so this wraps `parsePower`, not `parsePrimary`. */
+  function parseUnary(): Sym {
+    const t = peek();
+    if (t && t.type === "op" && t.value === "-") {
+      consume();
+      return symNeg(parseUnary());
+    }
+    if (t && t.type === "op" && t.value === "+") {
+      consume();
+      return parseUnary();
+    }
+    return parsePower();
+  }
+
   function parseMulDiv(): Sym {
-    let value = parsePower();
+    let value = parseUnary();
     while (true) {
       const t = peek();
       if (t && t.type === "op" && (t.value === "*" || t.value === "/")) {
         consume();
-        const rhs = parsePower();
+        const rhs = parseUnary();
         value = t.value === "*" ? symMul(value, rhs) : divide(value, rhs);
       } else if (t && (t.type === "letter" || t.type === "lparen" || t.type === "num")) {
-        const rhs = parsePower();
+        const rhs = parseUnary();
         value = symMul(value, rhs);
       } else break;
     }

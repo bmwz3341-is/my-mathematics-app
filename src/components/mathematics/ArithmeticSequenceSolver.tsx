@@ -5,6 +5,7 @@ import { TrendingUp } from "lucide-react";
 import { kindLabel, solveSequence, type SequenceInput, type SequenceResult } from "@/lib/arithmeticSequence";
 import SequenceTermsGraph from "@/components/mathematics/SequenceTermsGraph";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 interface FieldDef {
   key: keyof SequenceInput;
@@ -44,6 +45,7 @@ export default function ArithmeticSequenceSolver() {
   const [form, setForm] = useState<Record<keyof SequenceInput, string>>(EMPTY_FORM);
   const [findN, setFindN] = useState("");
   const [result, setResult] = useState<SequenceResult | null>(null);
+  const track = useTrackExercise();
 
   useDailyChallengeAutoFill("arithmeticSequences", (challenge) => {
     const values = { ...EMPTY_FORM, ...(challenge.params ?? {}) } as Record<keyof SequenceInput, string>;
@@ -63,26 +65,36 @@ export default function ArithmeticSequenceSolver() {
     return input;
   }
 
-  function solveWith(values: Record<keyof SequenceInput, string>) {
+  function solveWith(values: Record<keyof SequenceInput, string>): SequenceResult {
     const input = buildInput(values);
     if ("error" in input) {
-      setResult({ type: "error", message: input.error });
-      return;
+      const r: SequenceResult = { type: "error", message: input.error };
+      setResult(r);
+      return r;
     }
     let findIndex: number | undefined;
     const rawFindN = findN.trim();
     if (rawFindN !== "") {
       findIndex = parseFloat(rawFindN);
       if (!Number.isFinite(findIndex)) {
-        setResult({ type: "error", message: "הערך בשדה 'מצא איבר n' אינו מספר תקין" });
-        return;
+        const r: SequenceResult = { type: "error", message: "הערך בשדה 'מצא איבר n' אינו מספר תקין" };
+        setResult(r);
+        return r;
       }
     }
-    setResult(solveSequence(input, findIndex));
+    const r = solveSequence(input, findIndex);
+    setResult(r);
+    return r;
   }
 
   function handleSolve() {
-    solveWith(form);
+    const r = solveWith(form);
+    if (r.type === "result") {
+      const summary = FIELDS.filter((f) => form[f.key].trim() !== "")
+        .map((f) => `${f.key}=${form[f.key]}`)
+        .join(", ");
+      track("arithmeticSequences", summary);
+    }
   }
 
   function handleExample(example: Example) {

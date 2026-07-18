@@ -6,6 +6,7 @@ import { solveSystem3, type System3Result } from "@/lib/system3Equations";
 import System3EquationsGraph from "@/components/mathematics/System3EquationsGraph";
 import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 const EXAMPLES: { eq1: string; eq2: string; eq3: string }[] = [
   { eq1: "x + y + z = 6", eq2: "2x - y + z = 3", eq3: "x + 2y - z = 2" },
@@ -24,9 +25,12 @@ export default function System3EquationsSolver() {
   const [eq2Input, setEq2Input] = useState("");
   const [eq3Input, setEq3Input] = useState("");
   const [result, setResult] = useState<System3Result | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve(e1 = eq1Input, e2 = eq2Input, e3 = eq3Input) {
-    setResult(solveSystem3(e1, e2, e3));
+    const r = solveSystem3(e1, e2, e3);
+    setResult(r);
+    if (r.type !== "error") track("systemOf3Equations", `${e1} | ${e2} | ${e3}`);
   }
 
   function handleExample(example: { eq1: string; eq2: string; eq3: string }) {

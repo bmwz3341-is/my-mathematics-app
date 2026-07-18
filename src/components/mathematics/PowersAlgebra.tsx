@@ -5,6 +5,7 @@ import { Superscript } from "lucide-react";
 import { solvePowerExpression, type PowerSolveResult } from "@/lib/powerLaws";
 import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 const EXAMPLES = [
   "x^2 * x^3",
@@ -34,9 +35,12 @@ const LAWS = [
 export default function PowersAlgebra() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<PowerSolveResult | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve() {
-    setResult(solvePowerExpression(input));
+    const r = solvePowerExpression(input);
+    setResult(r);
+    if (r.type === "result") track("powersAlgebra", input);
   }
 
   function handleExample(example: string) {

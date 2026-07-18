@@ -23,12 +23,6 @@ const CARDS: TrackCard[] = [
     href: "/TrigoGeo",
     badge: "sin∆",
   },
-  {
-    id: "vectors3d",
-    label: "וקטורים ותלת-מימד",
-    href: "/mathematics/complex-numbers",
-    icon: ArrowRightLeft,
-  },
 ];
 
 export default function SpaceGeometryPage() {

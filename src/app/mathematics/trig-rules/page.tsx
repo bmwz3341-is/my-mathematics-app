@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Heebo } from "next/font/google";
@@ -12,10 +12,24 @@ const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700"
 
 const VALID_LAWS: LawMode[] = ["sines", "cosines"];
 
+const LAW_COPY: Record<LawMode, { title: string; description: string }> = {
+  sines: {
+    title: "משפט הסינוסים",
+    description:
+      "הזינו את הצלעות והזוויות הידועות (השאירו ריקים את החסרים), וקבלו פתרון שלב אחר שלב — כולל טיפול במקרה הדו-משמעי (SSA)",
+  },
+  cosines: {
+    title: "משפט הקוסינוסים",
+    description: "הזינו את הצלעות והזוויות הידועות (השאירו ריקים את החסרים), וקבלו פתרון שלב אחר שלב",
+  },
+};
+
 function TrigRulesContent() {
   const searchParams = useSearchParams();
   const lawParam = searchParams.get("law");
   const initialLaw: LawMode = VALID_LAWS.includes(lawParam as LawMode) ? (lawParam as LawMode) : "sines";
+  const [law, setLaw] = useState<LawMode>(initialLaw);
+  const copy = LAW_COPY[law];
 
   return (
     <div
@@ -29,15 +43,11 @@ function TrigRulesContent() {
       <div className="pointer-events-none absolute -bottom-24 -right-24 size-80 rounded-full bg-cyan-200/40 blur-3xl" />
 
       <div className="relative">
-        <h1 className="text-right text-2xl font-extrabold text-orange-500 sm:text-3xl">
-          משפט הסינוסים ומשפט הקוסינוסים
-        </h1>
-        <p className="mt-4 text-right text-sm font-medium text-slate-600">
-          בחרו את המשפט המתאים, הזינו את הצלעות והזוויות הידועות (השאירו ריקים את החסרים), וקבלו פתרון שלב אחר שלב — כולל טיפול במקרה הדו-משמעי (SSA) במשפט הסינוסים
-        </p>
+        <h1 className="text-right text-2xl font-extrabold text-orange-500 sm:text-3xl">{copy.title}</h1>
+        <p className="mt-4 text-right text-sm font-medium text-slate-600">{copy.description}</p>
 
         <div className="mt-6">
-          <TrigLawsSolver key={initialLaw} initialLaw={initialLaw} />
+          <TrigLawsSolver key={initialLaw} initialLaw={initialLaw} onLawChange={setLaw} />
         </div>
       </div>
 

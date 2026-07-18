@@ -1,4 +1,4 @@
-import { Calculator, ChartArea, ChartSpline, Crosshair, Dices, GitMerge, Layers3, Logs, Orbit, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
+import { Calculator, ChartArea, ChartSpline, Circle, Crosshair, Dices, GitMerge, Layers3, Logs, Orbit, Radical, Sigma, SquareFunction, Superscript, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface MathItem {
@@ -38,7 +38,7 @@ export const mathItems: MathItem[] = [
   },
   {
     id: "logarithmicEquations",
-    label: "לוגריתמים",
+    label: "פונקציות מעריכיות ולוגריתמים",
     icon: Logs,
     color: "bg-teal-500",
     badge: "log",
@@ -117,6 +117,15 @@ export const mathItems: MathItem[] = [
     label: "מספרים מרוכבים",
     icon: Orbit,
     color: "bg-violet-500",
+    badge: "i",
     href: "/mathematics/complex-numbers",
+  },
+  {
+    id: "circleGeometry",
+    label: "מעגל ומשיקים",
+    icon: Circle,
+    color: "bg-rose-500",
+    badge: "R",
+    href: "/mathematics/circle-geometry",
   },
 ];

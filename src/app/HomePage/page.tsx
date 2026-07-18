@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Camera, ChartColumn, Superscript, Toolbox, Triangle } from "lucide-react";
+import { ChartColumn, Superscript, Toolbox, Triangle } from "lucide-react";
 import SmartSearchBar from "@/components/shared/SmartSearchBar";
+import ExamHub from "@/components/mathematics/ExamHub";
 
 export default function HomePage() {
   return (
@@ -63,14 +64,7 @@ export default function HomePage() {
             <span className="text-xs text-gray-500">התפלגויות נורמלית וסטטיסטיקה</span>
           </Link>
         </div>
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-black/70">
-            <Camera className="size-4 text-white" strokeWidth={2} />
-          </span>
-          <p className="text-right text-sm text-white">
-            <span className="font-bold">טיפ:</span> לא בטוח מה לבחור? צלם את התרגיל והמערכת תזהה עבורך.
-          </p>
-        </div>
+        <ExamHub />
       </div>
     </div>
   );

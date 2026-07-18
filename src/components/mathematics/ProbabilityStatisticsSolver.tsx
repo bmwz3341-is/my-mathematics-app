@@ -20,6 +20,7 @@ import {
 } from "@/lib/probabilityStatistics";
 import NormalDistributionGraph from "@/components/mathematics/NormalDistributionGraph";
 import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 import type { Challenge } from "@/config/challenges";
 
 export type EngineId = "classical" | "conditional" | "binomial" | "descriptive" | "normal";
@@ -125,6 +126,7 @@ function ClassicalEngine({ autofill }: { autofill?: Challenge | null }) {
   const [favorable, setFavorable] = useState("");
   const [total, setTotal] = useState("");
   const [result, setResult] = useState<ClassicalProbabilityOutcome | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve(values?: { favorable: string; total: string }) {
     const f = parseFloat(values?.favorable ?? favorable);
@@ -133,7 +135,9 @@ function ClassicalEngine({ autofill }: { autofill?: Challenge | null }) {
       setResult({ type: "error", message: "נא להזין ערכים מספריים בשני השדות" });
       return;
     }
-    setResult(solveClassicalProbability(f, t));
+    const r = solveClassicalProbability(f, t);
+    setResult(r);
+    if (r.type === "result") track("probabilityStatistics", `favorable=${f}, total=${t}`);
   }
 
   useEffect(() => {
@@ -180,6 +184,7 @@ function ConditionalEngine({ autofill }: { autofill?: Challenge | null }) {
   const [pnotAB, setPnotAB] = useState("");
   const [pnotAnotB, setPnotAnotB] = useState("");
   const [result, setResult] = useState<ConditionalProbabilityOutcome | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve(values?: { pAB: string; pAnotB: string; pnotAB: string; pnotAnotB: string }) {
     const vals = [
@@ -192,14 +197,14 @@ function ConditionalEngine({ autofill }: { autofill?: Challenge | null }) {
       setResult({ type: "error", message: "נא למלא את כל ארבעת תאי הטבלה בערכים מספריים" });
       return;
     }
-    setResult(
-      solveConditionalProbability({
-        pAB: vals[0],
-        pAnotB: vals[1],
-        pnotAB: vals[2],
-        pnotAnotB: vals[3],
-      }),
-    );
+    const r = solveConditionalProbability({
+      pAB: vals[0],
+      pAnotB: vals[1],
+      pnotAB: vals[2],
+      pnotAnotB: vals[3],
+    });
+    setResult(r);
+    if (r.type === "result") track("probabilityStatistics", `P(A∩B)=${vals[0]}, P(A∩B')=${vals[1]}, P(A'∩B)=${vals[2]}, P(A'∩B')=${vals[3]}`);
   }
 
   useEffect(() => {
@@ -308,6 +313,7 @@ function BinomialEngine({ autofill }: { autofill?: Challenge | null }) {
   const [k, setK] = useState("");
   const [p, setP] = useState("");
   const [result, setResult] = useState<BinomialOutcome | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve(values?: { n: string; k: string; p: string }) {
     const nn = parseFloat(values?.n ?? n);
@@ -317,7 +323,9 @@ function BinomialEngine({ autofill }: { autofill?: Challenge | null }) {
       setResult({ type: "error", message: "נא להזין ערכים מספריים בכל השדות (n, k, p)" });
       return;
     }
-    setResult(solveBinomial(nn, kk, pp));
+    const r = solveBinomial(nn, kk, pp);
+    setResult(r);
+    if (r.type === "result") track("probabilityStatistics", `n=${nn}, k=${kk}, p=${pp}`);
   }
 
   useEffect(() => {
@@ -368,6 +376,7 @@ function DescriptiveEngine({ autofill }: { autofill?: Challenge | null }) {
   const [listText, setListText] = useState("");
   const [freqText, setFreqText] = useState("");
   const [result, setResult] = useState<DescriptiveStatsOutcome | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve(values?: { mode: "list" | "freq"; listText: string; freqText: string }) {
     const m = values?.mode ?? mode;
@@ -380,7 +389,9 @@ function DescriptiveEngine({ autofill }: { autofill?: Challenge | null }) {
         setResult({ type: "error", message: "נא להזין רשימת מספרים מופרדים בפסיקים, לדוגמה: 4, 7, 7, 9, 12" });
         return;
       }
-      setResult(solveDescriptiveStats({ mode: "list", values: values2 }));
+      const r = solveDescriptiveStats({ mode: "list", values: values2 });
+      setResult(r);
+      if (r.type === "result") track("probabilityStatistics", list);
     } else {
       const rows = freq.split(",").map((s) => s.trim()).filter((s) => s !== "");
       const pairs: FrequencyPair[] = [];
@@ -402,7 +413,9 @@ function DescriptiveEngine({ autofill }: { autofill?: Challenge | null }) {
         setResult({ type: "error", message: "נא להזין לפחות שורה אחת בטבלת השכיחויות" });
         return;
       }
-      setResult(solveDescriptiveStats({ mode: "freq", pairs }));
+      const r = solveDescriptiveStats({ mode: "freq", pairs });
+      setResult(r);
+      if (r.type === "result") track("probabilityStatistics", freq);
     }
   }
 
@@ -512,6 +525,7 @@ function NormalEngine({ autofill }: { autofill?: Challenge | null }) {
   const [x, setX] = useState("");
   const [x2, setX2] = useState("");
   const [result, setResult] = useState<NormalDistributionOutcome | null>(null);
+  const track = useTrackExercise();
 
   function handleSolve(values?: { mu: string; sigma: string; mode: NormalMode; x: string; x2: string }) {
     const muRaw = values?.mu ?? mu;
@@ -534,7 +548,11 @@ function NormalEngine({ autofill }: { autofill?: Challenge | null }) {
         return;
       }
     }
-    setResult(solveNormalDistribution({ mu: muVal, sigma: sigmaVal, mode: modeVal, x: xVal, x2: x2Val }));
+    const r = solveNormalDistribution({ mu: muVal, sigma: sigmaVal, mode: modeVal, x: xVal, x2: x2Val });
+    setResult(r);
+    if (r.type === "result") {
+      track("probabilityStatistics", `μ=${muVal}, σ=${sigmaVal}, ${modeVal}, x=${xVal}${x2Val !== undefined ? `, x2=${x2Val}` : ""}`);
+    }
   }
 
   useEffect(() => {

@@ -443,3 +443,175 @@ export function integrate(
     };
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Area between two functions                                          */
+/* ------------------------------------------------------------------ */
+
+export type AreaBetweenResult =
+  | {
+      type: "result";
+      variable: string;
+      fExpr: string;
+      gExpr: string;
+      fTerms: Term[];
+      gTerms: Term[];
+      roots: number[];
+      totalArea: number;
+      steps: IntegralStep[];
+    }
+  | { type: "error"; message: string };
+
+const AREA_SEARCH_RANGE = 25;
+const AREA_SEARCH_SAMPLES = 5000;
+
+/** Finds every real root of f in [lo, hi] by scanning for sign changes and refining each via bisection. */
+function findRootsByBisection(f: (x: number) => number, lo: number, hi: number, samples: number): number[] {
+  const roots: number[] = [];
+  const dx = (hi - lo) / samples;
+  let prevX = lo;
+  let prevY = f(lo);
+  for (let i = 1; i <= samples; i++) {
+    const x = lo + i * dx;
+    const y = f(x);
+    if (Number.isFinite(prevY) && Number.isFinite(y)) {
+      if (Math.abs(prevY) < 1e-9) {
+        roots.push(prevX);
+      } else if (prevY * y < 0) {
+        let a = prevX;
+        let b = x;
+        let fa = prevY;
+        for (let iter = 0; iter < 60; iter++) {
+          const mid = (a + b) / 2;
+          const fMid = f(mid);
+          if (!Number.isFinite(fMid) || Math.abs(fMid) < 1e-10 || b - a < 1e-10) {
+            a = b = mid;
+            break;
+          }
+          if (fa < 0 === fMid < 0) {
+            a = mid;
+            fa = fMid;
+          } else {
+            b = mid;
+          }
+        }
+        roots.push((a + b) / 2);
+      }
+    }
+    prevX = x;
+    prevY = y;
+  }
+  return roots;
+}
+
+/** Snaps a root to a nearby integer or small fraction (bagrut-style intersections are almost always "nice"). */
+function snapRoot(v: number): number {
+  const rounded = Math.round(v * 1e6) / 1e6;
+  const nearestInt = Math.round(rounded);
+  if (Math.abs(rounded - nearestInt) < 1e-4) return nearestInt;
+  for (const den of [2, 3, 4, 5, 6, 8, 10]) {
+    const num = Math.round(rounded * den);
+    if (Math.abs(rounded - num / den) < 1e-4) return num / den;
+  }
+  return rounded;
+}
+
+function dedupeSorted(values: number[], eps = 1e-4): number[] {
+  const sorted = [...values].sort((a, b) => a - b);
+  const out: number[] = [];
+  for (const v of sorted) {
+    if (out.length === 0 || Math.abs(v - out[out.length - 1]) > eps) out.push(v);
+  }
+  return out;
+}
+
+/**
+ * Solves for the area enclosed between f(x) and g(x): finds every intersection
+ * point (root of f-g) and integrates |f-g| across the full span, splitting at
+ * every interior root so the sign of f-g is constant on each sub-interval
+ * (∫|h| over a sub-interval where h doesn't change sign = |∫h|). Reuses
+ * integrate() itself for each sub-interval, so the antiderivative-rule and
+ * Newton-Leibniz steps for the common (single-interval) case come straight
+ * from the existing engine rather than being re-derived here.
+ */
+export function solveAreaBetweenFunctions(fRaw: string, gRaw: string): AreaBetweenResult {
+  const fTrim = fRaw.trim();
+  const gTrim = gRaw.trim();
+  if (!fTrim || !gTrim) return { type: "error", message: "נא להזין את שתי הפונקציות f(x) ו-g(x)" };
+  if (fTrim.includes("=") || gTrim.includes("=")) {
+    return { type: "error", message: "נא להזין ביטויים (פונקציות) ולא משוואות — ללא סימן =" };
+  }
+
+  const variable = detectVariable(`${fTrim} ${gTrim}`);
+
+  try {
+    const fTerms = combineLikeTerms(parseIntegrand(fTrim, variable));
+    const gTerms = combineLikeTerms(parseIntegrand(gTrim, variable));
+    const fExpr = formatExpression(fTerms, variable);
+    const gExpr = formatExpression(gTerms, variable);
+
+    const diffTerms = combineLikeTerms([...fTerms, ...gTerms.map((t) => ({ ...t, coefficient: -t.coefficient }))]);
+    if (diffTerms.length === 0) {
+      throw new IntegralError("שתי הפונקציות זהות — אין שטח חסום ביניהן (הן חופפות בכל תחום)");
+    }
+    const diffExpr = formatExpression(diffTerms, variable);
+    const h = (x: number) => evalTerms(diffTerms, x);
+
+    const steps: IntegralStep[] = [
+      { law: "השוואת הפונקציות למציאת נקודות חיתוך", expr: `f(${variable}) = g(${variable})  ⇒  ${diffExpr} = 0` },
+    ];
+
+    const rawRoots = findRootsByBisection(h, -AREA_SEARCH_RANGE, AREA_SEARCH_RANGE, AREA_SEARCH_SAMPLES);
+    const roots = dedupeSorted(rawRoots.map(snapRoot));
+
+    if (roots.length < 2) {
+      throw new IntegralError(
+        roots.length === 0
+          ? `לא נמצאו נקודות חיתוך בין הפונקציות בתחום החיפוש [-${AREA_SEARCH_RANGE}, ${AREA_SEARCH_RANGE}]`
+          : "נמצאה נקודת חיתוך אחת בלבד בתחום החיפוש — נדרשות לפחות שתי נקודות חיתוך כדי להגדיר שטח חסום",
+      );
+    }
+
+    steps.push({ law: "פתרון המשוואה", expr: `${diffExpr} = 0  ⇒  ${variable} = ${roots.map(formatNumber).join(",  ")}` });
+
+    const lo = roots[0];
+    const hi = roots[roots.length - 1];
+    steps.push({
+      law: "הגדרת האינטגרל המסוים",
+      expr: `S = ∫_{${formatNumber(lo)}}^{${formatNumber(hi)}} |${diffExpr}| d${variable}`,
+    });
+
+    let totalArea = 0;
+    const segmentAreas: number[] = [];
+    for (let i = 0; i < roots.length - 1; i++) {
+      const segLo = roots[i];
+      const segHi = roots[i + 1];
+      const segResult = integrate(diffExpr, "definite", String(segLo), String(segHi));
+      if (segResult.type === "error") throw new IntegralError(segResult.message);
+      const signedValue = segResult.definiteValue!;
+      const segArea = Math.abs(signedValue);
+      segmentAreas.push(segArea);
+      totalArea += segArea;
+
+      if (roots.length === 2) {
+        steps.push(...segResult.steps);
+        if (signedValue < 0) {
+          steps.push({ law: "השטח תמיד חיובי — ערך מוחלט", expr: `S = |${formatNumber(signedValue)}| = ${formatNumber(segArea)}` });
+        }
+      } else {
+        steps.push({
+          law: `שטח בתחום [${formatNumber(segLo)}, ${formatNumber(segHi)}]`,
+          expr: `|∫_{${formatNumber(segLo)}}^{${formatNumber(segHi)}} (${diffExpr}) d${variable}| = ${formatNumber(segArea)}`,
+        });
+      }
+    }
+
+    if (roots.length > 2) {
+      steps.push({ law: "סיכום השטחים", expr: `S = ${segmentAreas.map(formatNumber).join(" + ")} = ${formatNumber(totalArea)}` });
+    }
+
+    return { type: "result", variable, fExpr, gExpr, fTerms, gTerms, roots, totalArea, steps };
+  } catch (err) {
+    return { type: "error", message: err instanceof IntegralError ? err.message : "שגיאה בעיבוד הפונקציות" };
+  }
+}

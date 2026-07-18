@@ -13,6 +13,9 @@ import {
   type ComplexResult,
 } from "@/lib/complexSolver";
 import ArgandDiagram from "@/components/mathematics/ArgandDiagram";
+import DailyChallengeBanner from "@/components/mathematics/DailyChallengeBanner";
+import { useDailyChallengeAutoFill } from "@/lib/useDailyChallengeAutoFill";
+import { useTrackExercise } from "@/hooks/useTrackExercise";
 
 type Mode = "arithmetic" | "conversion" | "deMoivre" | "equation";
 
@@ -77,6 +80,7 @@ export default function ComplexNumberSolver() {
   const [equation, setEquation] = useState("");
 
   const [result, setResult] = useState<ComplexResult | null>(null);
+  const track = useTrackExercise();
 
   function switchMode(next: Mode) {
     setMode(next);
@@ -85,24 +89,45 @@ export default function ComplexNumberSolver() {
 
   function handleSolve() {
     switch (mode) {
-      case "arithmetic":
-        setResult(solveArithmetic(z1, z2, op));
+      case "arithmetic": {
+        const r = solveArithmetic(z1, z2, op);
+        setResult(r);
+        if (r.type === "result") track("complexNumbers", `${z1} ${OPS.find((o) => o.id === op)?.label ?? op} ${z2}`);
         break;
-      case "conversion":
-        setResult(convDirection === "toTrig" ? convertToTrig(convZ) : convertToAlgebraic(convR, convTheta));
+      }
+      case "conversion": {
+        const r = convDirection === "toTrig" ? convertToTrig(convZ) : convertToAlgebraic(convR, convTheta);
+        setResult(r);
+        if (r.type === "result") {
+          track("complexNumbers", convDirection === "toTrig" ? convZ : `${convR}∠${convTheta}°`);
+        }
         break;
-      case "deMoivre":
-        setResult(dmKind === "power" ? solvePower(dmZ, dmN) : solveRoots(dmZ, dmN));
+      }
+      case "deMoivre": {
+        const r = dmKind === "power" ? solvePower(dmZ, dmN) : solveRoots(dmZ, dmN);
+        setResult(r);
+        if (r.type === "result") track("complexNumbers", dmKind === "power" ? `(${dmZ})^${dmN}` : `${dmN}√(${dmZ})`);
         break;
-      case "equation":
-        setResult(solveComplexEquation(equation));
+      }
+      case "equation": {
+        const r = solveComplexEquation(equation);
+        setResult(r);
+        if (r.type === "result") track("complexNumbers", equation);
         break;
+      }
     }
   }
 
   function onEnter(e: React.KeyboardEvent) {
     if (e.key === "Enter") handleSolve();
   }
+
+  const dailyChallengeActive = useDailyChallengeAutoFill("complexNumbers", (challenge) => {
+    const equationText = challenge.equation1 ?? "";
+    setMode("equation");
+    setEquation(equationText);
+    setResult(solveComplexEquation(equationText));
+  });
 
   const inputClass =
     "mt-1 w-full rounded-xl border border-white/60 bg-white/50 px-4 py-3 text-left text-lg font-bold text-slate-800 placeholder:font-medium placeholder:text-slate-400 focus:border-[#2F6FED] focus:outline-none";
@@ -374,6 +399,7 @@ export default function ComplexNumberSolver() {
           <label htmlFor="complex-equation" className="block text-right text-sm font-bold text-slate-600">
             הזינו משוואה עם הנעלם z — כולל משוואות ריבועיות עם דיסקרימיננטה שלילית
           </label>
+          <DailyChallengeBanner active={dailyChallengeActive} />
           <input
             id="complex-equation"
             type="text"
