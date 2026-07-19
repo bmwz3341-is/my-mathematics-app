@@ -4,51 +4,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
-import { ArrowRight, Camera, ChartSpline, Search, Shuffle, TrendingUp, X } from "lucide-react";
+import { ArrowRight, Camera, Search, Shuffle, X } from "lucide-react";
 import { generateDailyChallenge } from "@/config/challenges";
 import { setPendingChallenge } from "@/lib/dailyChallengeSession";
+import { PROBABILITY_SEQUENCES_CARDS as CARDS } from "@/config/probabilitySequencesData";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
-
-interface TrackCard {
-  id: string;
-  label: string;
-  href: string;
-  badge?: string;
-  icon?: typeof TrendingUp;
-  color: string;
-}
-
-const CARDS: TrackCard[] = [
-  {
-    id: "statistics",
-    label: "סטטיסטיקה",
-    href: "/mathematics/probability-statistics?engine=descriptive",
-    badge: "x̄",
-    color: "bg-purple-500",
-  },
-  {
-    id: "normalDistribution",
-    label: "התפלגות נורמלית",
-    href: "/mathematics/probability-statistics?engine=normal",
-    badge: "𝒩",
-    color: "bg-indigo-600",
-  },
-  {
-    id: "arithmeticSequences",
-    label: "סדרות חשבוניות",
-    href: "/mathematics/arithmetic-sequences",
-    icon: TrendingUp,
-    color: "bg-lime-600",
-  },
-  {
-    id: "geometricSequences",
-    label: "סדרות הנדסיות",
-    href: "/mathematics/geometric-sequences",
-    icon: ChartSpline,
-    color: "bg-amber-500",
-  },
-];
 
 export default function ProbabilitySequencesPage() {
   const router = useRouter();

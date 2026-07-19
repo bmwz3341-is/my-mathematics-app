@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calculator, LineChart, ScanText, Search, Sigma, X } from "lucide-react";
+import { Calculator, ScanText, Search, X } from "lucide-react";
 import { allConversionItemsFlat, type AllConversionItem } from "@/config/allConversionsData";
+import { appSearchItems, type AppSearchItem } from "@/config/appSearchIndex";
 import { addRecentConversionId } from "@/lib/recentConversions";
 import { evaluateMathExpression, looksLikeMathExpression } from "@/lib/mathEvaluator";
+import { matchesSearch } from "@/lib/searchMatch";
 
 interface SystemAction {
   id: string;
@@ -14,10 +16,9 @@ interface SystemAction {
   keywords: string[];
 }
 
+// Features that don't have a page yet — shown as a placeholder so the search still surfaces them.
 const SYSTEM_ACTIONS: SystemAction[] = [
   { id: "ocr", label: "סריקת OCR", icon: ScanText, keywords: ["ocr", "סריקה", "סרוק", "תמונה"] },
-  { id: "equations", label: "פתרון משוואות", icon: Sigma, keywords: ["משוואות", "משוואה", "equation"] },
-  { id: "graph", label: "שרטוט גרף", icon: LineChart, keywords: ["גרף", "שרטוט", "graph"] },
 ];
 
 const MAX_RESULTS = 6;
@@ -42,7 +43,20 @@ export default function SmartSearchBar() {
     if (!trimmedQuery) return [];
     const q = trimmedQuery.toLowerCase();
     return allConversionItemsFlat
-      .filter((item) => item.label.includes(trimmedQuery) || item.id.toLowerCase().includes(q))
+      .filter((item) => matchesSearch(item.label, trimmedQuery) || item.id.toLowerCase().includes(q))
+      .slice(0, MAX_RESULTS);
+  }, [trimmedQuery]);
+
+  const matchedTools = useMemo(() => {
+    if (!trimmedQuery) return [];
+    const q = trimmedQuery.toLowerCase();
+    return appSearchItems
+      .filter(
+        (item) =>
+          matchesSearch(item.label, trimmedQuery) ||
+          item.id.toLowerCase().includes(q) ||
+          item.keywords?.some((k) => matchesSearch(k, trimmedQuery)),
+      )
       .slice(0, MAX_RESULTS);
   }, [trimmedQuery]);
 
@@ -51,17 +65,26 @@ export default function SmartSearchBar() {
     const q = trimmedQuery.toLowerCase();
     return SYSTEM_ACTIONS.filter(
       (action) =>
-        action.label.includes(trimmedQuery) ||
+        matchesSearch(action.label, trimmedQuery) ||
         action.keywords.some((k) => k.toLowerCase().includes(q)),
     );
   }, [trimmedQuery]);
 
   const isSearching = trimmedQuery.length > 0;
-  const hasResults = mathResult !== null || matchedConversions.length > 0 || matchedActions.length > 0;
+  const hasResults =
+    mathResult !== null ||
+    matchedTools.length > 0 ||
+    matchedConversions.length > 0 ||
+    matchedActions.length > 0;
 
   function goToConversion(item: AllConversionItem) {
     addRecentConversionId(item.id);
     router.push(`/AllConversions?item=${item.id}`);
+    setQuery("");
+  }
+
+  function goToTool(item: AppSearchItem) {
+    router.push(item.href);
     setQuery("");
   }
 
@@ -107,6 +130,29 @@ export default function SmartSearchBar() {
             <p className="py-4 text-center text-sm font-bold text-slate-500">
               לא נמצאו תוצאות
             </p>
+          )}
+
+          {matchedTools.length > 0 && (
+            <div className="mb-2">
+              <p className="px-1 pb-1 text-right text-xs font-bold text-slate-400">כלים מתמטיים</p>
+              <div className="flex flex-col gap-1">
+                {matchedTools.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => goToTool(item)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-right transition hover:bg-blue-50"
+                  >
+                    <span
+                      className={`flex size-8 items-center justify-center rounded-lg ${item.color}`}
+                    >
+                      <item.icon className="size-4 text-white" strokeWidth={2} />
+                    </span>
+                    <span className="text-sm font-bold text-black">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
           {matchedConversions.length > 0 && (

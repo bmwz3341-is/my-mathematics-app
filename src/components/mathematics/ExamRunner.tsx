@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, RotateCcw, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, CheckCircle2, RotateCcw, X, XCircle } from "lucide-react";
 import type { Exam } from "@/lib/exams";
 import { checkAnswer, type CheckResult } from "@/lib/examChecker";
 import { useExamProgress } from "@/hooks/useExamProgress";
@@ -20,6 +21,11 @@ const ANSWER_HINTS: Record<string, string> = {
   circleGeometry: "הזינו מרכז ורדיוס מופרדים בפסיק, למשל 2, -3, 4",
   systemOfEquations: "הזינו x ו-y מופרדים בפסיק, למשל 2, 3",
   systemOf3Equations: "הזינו x, y ו-z מופרדים בפסיק, למשל 1, 2, 3",
+};
+
+/** Per-question-mode hint, takes priority over ANSWER_HINTS[subject] when set. */
+const MODE_HINTS: Record<string, string> = {
+  extrema: "הזינו את נקודות הקיצון (x, y) מופרדות בפסיק, למשל -1, 4, 3, -20",
 };
 
 /** "eq1 | eq2 | eq3" -> one line per equation, for systems of equations. */
@@ -81,6 +87,7 @@ export default function ExamRunner({ exam }: { exam: Exam }) {
   const [userInput, setUserInput] = useState("");
   const [checked, setChecked] = useState<CheckResult | null>(null);
   const track = useTrackExercise();
+  const router = useRouter();
 
   const subjectTool = mathItems.find((item) => item.id === exam.subject);
   const totalQuestions = exam.questions.length;
@@ -89,7 +96,7 @@ export default function ExamRunner({ exam }: { exam: Exam }) {
 
   function handleCheck() {
     if (!question || checked) return;
-    const result = checkAnswer(exam.subject, question.expression, userInput, question.expectedAnswer);
+    const result = checkAnswer(exam.subject, question.expression, userInput, question.expectedAnswer, question.mode);
     setChecked(result);
     update({
       ...progress,
@@ -116,6 +123,12 @@ export default function ExamRunner({ exam }: { exam: Exam }) {
     reset();
     setUserInput("");
     setChecked(null);
+  }
+
+  function handleCancel() {
+    if (!window.confirm("לבטל את המבחן? ההתקדמות שלך תימחק.")) return;
+    reset();
+    router.push("/exams");
   }
 
   if (!question || progress.completed) {
@@ -182,13 +195,26 @@ export default function ExamRunner({ exam }: { exam: Exam }) {
     );
   }
 
+  const hint = (question.mode && MODE_HINTS[question.mode]) || ANSWER_HINTS[exam.subject];
+
   return (
     <div className="rounded-2xl border border-white/60 bg-white/35 p-5 backdrop-blur-xl backdrop-saturate-150">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
         <span className="shrink-0 text-xs font-bold text-black">
           שאלה {index + 1} מתוך {totalQuestions}
         </span>
-        <h2 className="text-right text-lg font-extrabold text-slate-900">{exam.title}</h2>
+        <h2 className="min-w-0 flex-1 truncate text-right text-lg font-extrabold text-slate-900">
+          {exam.title}
+        </h2>
+        <button
+          type="button"
+          onClick={handleCancel}
+          aria-label="ביטול מבחן"
+          title="ביטול מבחן"
+          className="shrink-0 rounded-lg p-1.5 text-slate-500 transition hover:bg-red-50 hover:text-red-600"
+        >
+          <X className="size-5" strokeWidth={2} />
+        </button>
       </div>
       <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/40">
         <div
@@ -201,9 +227,7 @@ export default function ExamRunner({ exam }: { exam: Exam }) {
         <ExpressionDisplay expression={question.expression} />
       </div>
 
-      {ANSWER_HINTS[exam.subject] && (
-        <p className="mt-2 text-right text-xs font-bold text-black">{ANSWER_HINTS[exam.subject]}</p>
-      )}
+      {hint && <p className="mt-2 text-right text-xs font-bold text-black">{hint}</p>}
 
       <input
         type="text"

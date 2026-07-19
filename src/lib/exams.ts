@@ -13,6 +13,8 @@ export interface ExamQuestion {
   id: string;
   expression: string;
   expectedAnswer: string;
+  /** functionAnalysis-only: "derivative" (default) asks for f'(x); "extrema" asks for the min/max points. */
+  mode?: "derivative" | "extrema";
 }
 
 export interface Exam {

@@ -4,42 +4,10 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
-import {
-  ArrowRight,
-  Camera,
-  Search,
-  Shuffle,
-  X,
-  Triangle,
-  Ruler,
-  Equal,
-  SquareFunction,
-  CircleDot,
-  ArrowRightLeft,
-  Box,
-  Layers,
-} from "lucide-react";
+import { ArrowRight, Camera, Search, Shuffle, X } from "lucide-react";
+import { TRIGOGEO_CARDS } from "@/config/trigoGeoData";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
-
-interface TopicCard {
-  id: string;
-  label: string;
-  href: string;
-  icon: typeof Triangle;
-  badge: string;
-}
-
-const TRIGOGEO_CARDS: TopicCard[] = [
-  { id: "trigLaws", label: "משפטי הסינוסים והקוסינוסים", href: "/mathematics/trig-rules", icon: Triangle, badge: "sin/cos" },
-  { id: "triangleArea", label: "מחשבון שטחי מצולעים", href: "/mathematics/triangle-area", icon: Ruler, badge: "S" },
-  { id: "trigIdentities", label: "זהויות טריגונומטריות", href: "/mathematics/trig-identities", icon: Equal, badge: "≡" },
-  { id: "trigEquations", label: "משוואות טריגונומטריות", href: "/mathematics/trig-equations", icon: SquareFunction, badge: "=0" },
-  { id: "unitCircleRadians", label: "מעגל היחידה ורדיאנים", href: "/mathematics/unit-circle-radians", icon: CircleDot, badge: "rad" },
-  { id: "algebraicVectors", label: "וקטורים אלגבריים", href: "/mathematics/algebraic-vectors", icon: ArrowRightLeft, badge: "Vec" },
-  { id: "spaceGeometry3D", label: "גיאומטריה של המרחב", href: "/mathematics/geometry-3d", icon: Box, badge: "3D" },
-  { id: "planeLineEquation", label: "משוואת מישור וישר", href: "/mathematics/plane-and-line-equations", icon: Layers, badge: "Plane" },
-];
 
 export default function TrigoGeoPage() {
   const router = useRouter();

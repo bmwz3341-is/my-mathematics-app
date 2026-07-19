@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Heebo } from "next/font/google";
-import { ArrowRight, ArrowRightLeft, Camera, Search, Shuffle, X } from "lucide-react";
+import { ArrowRight, ArrowRightLeft, Search, Shuffle, X } from "lucide-react";
 
 const heebo = Heebo({ subsets: ["hebrew", "latin"], weight: ["400", "500", "700", "800"] });
 
@@ -121,15 +121,6 @@ export default function SpaceGeometryPage() {
               </Link>
             ))
           )}
-        </div>
-
-        <div className="mt-6 flex items-center justify-between gap-3 rounded-xl border border-white/40 bg-white/20 px-4 py-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-black/70">
-            <Camera className="size-4 text-white" strokeWidth={2} />
-          </span>
-          <p className="text-right text-sm text-slate-800">
-            <span className="font-bold">טיפ:</span> לא בטוח מה לבחור? צלם את התרגיל והמערכת תזהה עבורך.
-          </p>
         </div>
       </div>
     </div>

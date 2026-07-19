@@ -21,10 +21,14 @@ function shuffled<T>(items: T[]): T[] {
 
 /** The exam list, reached from the home screen's "מרכז מבחנים" card. Re-shuffled on every visit. */
 export default function ExamsPage() {
-  const [orderedExams] = useState<Exam[]>(() => shuffled(exams));
+  // Starts in the unshuffled (server-rendered) order and reshuffles only after mount —
+  // shuffling during the initial render would run once on the server and again on the
+  // client, producing a different order each time and causing a hydration mismatch.
+  const [orderedExams, setOrderedExams] = useState<Exam[]>(exams);
   const [progressByExam, setProgressByExam] = useState<Record<string, ExamProgress>>({});
 
   useEffect(() => {
+    setOrderedExams(shuffled(exams));
     const map: Record<string, ExamProgress> = {};
     for (const exam of exams) map[exam.id] = getExamProgress(exam.id);
     setProgressByExam(map);

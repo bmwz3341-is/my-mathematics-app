@@ -65,6 +65,18 @@ describe("checkAnswer — functionAnalysis (live-engine checker)", () => {
   it("rejects a wrong derivative", () => {
     expect(checkAnswer("functionAnalysis", "x^3 - 3x^2", "3x^2 - 5x", "irrelevant").isCorrect).toBe(false);
   });
+
+  it("mode: extrema — accepts the (x, y) pairs of every critical point, in any order", () => {
+    const r = checkAnswer("functionAnalysis", "x^3 - 3x^2", "irrelevant", "irrelevant", "extrema");
+    expect(r.isCorrect).toBe(false); // "irrelevant" has no numbers
+    expect(checkAnswer("functionAnalysis", "x^3 - 3x^2", "0, 0, 2, -4", "irrelevant", "extrema").isCorrect).toBe(true);
+    expect(checkAnswer("functionAnalysis", "x^3 - 3x^2", "2, -4, 0, 0", "irrelevant", "extrema").isCorrect).toBe(true);
+  });
+
+  it("mode: extrema — rejects an incomplete or wrong set of points", () => {
+    expect(checkAnswer("functionAnalysis", "x^3 - 3x^2", "0, 0", "irrelevant", "extrema").isCorrect).toBe(false);
+    expect(checkAnswer("functionAnalysis", "x^3 - 3x^2", "1, 1, 2, -4", "irrelevant", "extrema").isCorrect).toBe(false);
+  });
 });
 
 describe("checkAnswer — circleGeometry (live-engine checker)", () => {
@@ -101,7 +113,13 @@ describe("exams.json — every seeded question's expectedAnswer matches the live
   for (const exam of exams) {
     for (const question of exam.questions) {
       it(`${exam.id} / ${question.id}: "${question.expression}" -> "${question.expectedAnswer}"`, () => {
-        const result = checkAnswer(exam.subject, question.expression, question.expectedAnswer, question.expectedAnswer);
+        const result = checkAnswer(
+          exam.subject,
+          question.expression,
+          question.expectedAnswer,
+          question.expectedAnswer,
+          question.mode,
+        );
         expect(result.verified).toBe(true);
         expect(result.isCorrect).toBe(true);
       });

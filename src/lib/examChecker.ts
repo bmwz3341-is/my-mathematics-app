@@ -16,7 +16,7 @@ import { solveMathInput } from "@/lib/equationSolver";
 import { solveQuadratic } from "@/lib/quadraticSolver";
 import { solvePowerExpression } from "@/lib/powerLaws";
 import { solveLogarithmicEquation } from "@/lib/logarithmEquations";
-import { differentiateExpr } from "@/lib/functionAnalysis";
+import { differentiateExpr, findExtrema, type CriticalPoint } from "@/lib/functionAnalysis";
 import { analyzeCircle } from "@/lib/circleGeometry";
 import { solveSystem } from "@/lib/systemOfEquations";
 import { solveSystem3 } from "@/lib/system3Equations";
@@ -84,7 +84,16 @@ function extractHeadlineAnswer(headline: string): string {
   return (eqMatch ? eqMatch[1] : afterArrow).trim();
 }
 
-type Checker = (expression: string, userAnswer: string) => CheckResult | null;
+type Checker = (expression: string, userAnswer: string, mode?: string) => CheckResult | null;
+
+function formatCoord(n: number): string {
+  const rounded = Math.round(n * 1e4) / 1e4;
+  return rounded.toLocaleString("en-US", { maximumFractionDigits: 4 });
+}
+
+function extremaKindLabel(kind: CriticalPoint["kind"]): string {
+  return kind === "min" ? "מינימום" : kind === "max" ? "מקסימום" : "קיצון";
+}
 
 const CHECKERS: Record<string, Checker> = {
   linearEquations: (expression, userAnswer) => {
@@ -133,14 +142,51 @@ const CHECKERS: Record<string, Checker> = {
     };
   },
 
-  functionAnalysis: (expression, userAnswer) => {
+  functionAnalysis: (expression, userAnswer, mode) => {
     const result = differentiateExpr(expression);
     if (result.type !== "result") return null;
+
+    // Every question — derivative or extrema — shows the full investigation:
+    // the derivative steps followed by the min/max classification, so the
+    // solution panel never omits the extrema half of "חקירת פונקציות".
+    const derivativeSteps = result.steps.map((s) => ({ label: s.law, expr: s.expr }));
+    const analysis = findExtrema(result.originalSym, result.variable);
+    const extremaOnlySteps =
+      analysis.type === "result" ? analysis.steps.map((s) => ({ label: s.law, expr: s.expr })) : [];
+    const extremaSummary =
+      analysis.type === "result" && analysis.criticalPoints.length > 0
+        ? [...analysis.criticalPoints]
+            .sort((a, b) => a.x - b.x)
+            .map((cp) => `${extremaKindLabel(cp.kind)} (${formatCoord(cp.x)}, ${formatCoord(cp.y)})`)
+            .join(", ")
+        : (analysis.type === "result" ? analysis.note : undefined) ?? "אין נקודות קיצון";
+    const allSteps = [
+      ...derivativeSteps,
+      ...extremaOnlySteps,
+      { label: "נקודות קיצון (מינימום/מקסימום)", expr: extremaSummary },
+    ];
+
+    if (mode === "extrema") {
+      if (analysis.type !== "result") return null;
+      if (analysis.criticalPoints.length === 0) {
+        return {
+          isCorrect: /^(אין|no|∅)/i.test(userAnswer.trim()),
+          correctAnswer: extremaSummary,
+          verified: true,
+          steps: allSteps,
+        };
+      }
+      const sorted = [...analysis.criticalPoints].sort((a, b) => a.x - b.x);
+      const correctNums = sorted.flatMap((cp) => [cp.x, cp.y]);
+      const isCorrect = numberSetsMatch(extractNumbers(userAnswer), correctNums);
+      return { isCorrect, correctAnswer: extremaSummary, verified: true, steps: allSteps };
+    }
+
     return {
       isCorrect: normalize(userAnswer) === normalize(result.derivativeExpr),
       correctAnswer: result.derivativeExpr,
       verified: true,
-      steps: result.steps.map((s) => ({ label: s.law, expr: s.expr })),
+      steps: allSteps,
     };
   },
 
@@ -174,8 +220,14 @@ const CHECKERS: Record<string, Checker> = {
   },
 };
 
-export function checkAnswer(subject: string, expression: string, userAnswer: string, expectedAnswer: string): CheckResult {
-  const live = CHECKERS[subject]?.(expression, userAnswer);
+export function checkAnswer(
+  subject: string,
+  expression: string,
+  userAnswer: string,
+  expectedAnswer: string,
+  mode?: string,
+): CheckResult {
+  const live = CHECKERS[subject]?.(expression, userAnswer, mode);
   if (live) return live;
   return { isCorrect: answersMatch(userAnswer, expectedAnswer), correctAnswer: expectedAnswer, verified: false, steps: [] };
 }

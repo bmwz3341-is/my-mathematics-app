@@ -5,10 +5,201 @@
     "subject": "linearEquations",
     "difficulty": "easy",
     "questions": [
-      { "id": "q1", "expression": "2x + 3 = 7", "expectedAnswer": "2" },
-      { "id": "q2", "expression": "4x - 5 = 11", "expectedAnswer": "4" },
-      { "id": "q3", "expression": "3*(x + 2) = 21", "expectedAnswer": "5" },
-      { "id": "q4", "expression": "5x - 1 = 3x + 9", "expectedAnswer": "5" }
+      {
+        "id": "q1",
+        "expression": "2x + 3 = 7",
+        "expectedAnswer": "2"
+      },
+      {
+        "id": "q2",
+        "expression": "4x - 5 = 11",
+        "expectedAnswer": "4"
+      },
+      {
+        "id": "q3",
+        "expression": "3*(x + 2) = 21",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q4",
+        "expression": "5x - 1 = 3x + 9",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q5",
+        "expression": "3*(x - 5) = -15",
+        "expectedAnswer": "0"
+      },
+      {
+        "id": "q6",
+        "expression": "2*(x - 6) = 0",
+        "expectedAnswer": "6"
+      },
+      {
+        "id": "q7",
+        "expression": "5x - 4 = 36",
+        "expectedAnswer": "8"
+      },
+      {
+        "id": "q8",
+        "expression": "7x + 8 = 29",
+        "expectedAnswer": "3"
+      },
+      {
+        "id": "q9",
+        "expression": "6x - 4 = 2x + 20",
+        "expectedAnswer": "6"
+      },
+      {
+        "id": "q10",
+        "expression": "7x - 5 = 6x - 12",
+        "expectedAnswer": "-7"
+      },
+      {
+        "id": "q11",
+        "expression": "3x - 6 = 5x + 0",
+        "expectedAnswer": "-3"
+      },
+      {
+        "id": "q12",
+        "expression": "3x + 9 = -15",
+        "expectedAnswer": "-8"
+      },
+      {
+        "id": "q13",
+        "expression": "6x + 1 = 7x + 1",
+        "expectedAnswer": "0"
+      },
+      {
+        "id": "q14",
+        "expression": "4*(x - 1) = -8",
+        "expectedAnswer": "-1"
+      },
+      {
+        "id": "q15",
+        "expression": "8x - 6 = -46",
+        "expectedAnswer": "-5"
+      },
+      {
+        "id": "q16",
+        "expression": "3x + 1 = 4x + 3",
+        "expectedAnswer": "-2"
+      },
+      {
+        "id": "q17",
+        "expression": "5x - 6 = -1",
+        "expectedAnswer": "1"
+      },
+      {
+        "id": "q18",
+        "expression": "6*(x + 3) = -24",
+        "expectedAnswer": "-7"
+      },
+      {
+        "id": "q19",
+        "expression": "3x + 8 = 2x + 1",
+        "expectedAnswer": "-7"
+      },
+      {
+        "id": "q20",
+        "expression": "4x - 1 = -17",
+        "expectedAnswer": "-4"
+      },
+      {
+        "id": "q21",
+        "expression": "3x - 6 = 7x - 10",
+        "expectedAnswer": "1"
+      },
+      {
+        "id": "q22",
+        "expression": "2x - 3 = 4x - 13",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q23",
+        "expression": "6*(x - 4) = -60",
+        "expectedAnswer": "-6"
+      },
+      {
+        "id": "q24",
+        "expression": "4*(x + 5) = 52",
+        "expectedAnswer": "8"
+      },
+      {
+        "id": "q25",
+        "expression": "4*(x + 3) = -8",
+        "expectedAnswer": "-5"
+      },
+      {
+        "id": "q26",
+        "expression": "2x + 8 = 10",
+        "expectedAnswer": "1"
+      },
+      {
+        "id": "q27",
+        "expression": "7x + 5 = 3x - 19",
+        "expectedAnswer": "-6"
+      },
+      {
+        "id": "q28",
+        "expression": "3*(x - 4) = -21",
+        "expectedAnswer": "-3"
+      },
+      {
+        "id": "q29",
+        "expression": "2x + 1 = 7x - 9",
+        "expectedAnswer": "2"
+      },
+      {
+        "id": "q30",
+        "expression": "4x + 1 = 9",
+        "expectedAnswer": "2"
+      },
+      {
+        "id": "q31",
+        "expression": "2*(x - 6) = -2",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q32",
+        "expression": "8x + 6 = 38",
+        "expectedAnswer": "4"
+      },
+      {
+        "id": "q33",
+        "expression": "4*(x - 4) = -12",
+        "expectedAnswer": "1"
+      },
+      {
+        "id": "q34",
+        "expression": "3*(x - 6) = -39",
+        "expectedAnswer": "-7"
+      },
+      {
+        "id": "q35",
+        "expression": "4x - 1 = 3x - 8",
+        "expectedAnswer": "-7"
+      },
+      {
+        "id": "q36",
+        "expression": "5x + 8 = 4x + 16",
+        "expectedAnswer": "8"
+      },
+      {
+        "id": "q37",
+        "expression": "3*(x - 2) = 12",
+        "expectedAnswer": "6"
+      },
+      {
+        "id": "q38",
+        "expression": "2*(x - 5) = -2",
+        "expectedAnswer": "4"
+      },
+      {
+        "id": "q39",
+        "expression": "5x + 1 = 21",
+        "expectedAnswer": "4"
+      }
     ]
   },
   {
@@ -17,10 +208,201 @@
     "subject": "quadraticEquations",
     "difficulty": "medium",
     "questions": [
-      { "id": "q1", "expression": "x^2 - 5x + 6 = 0", "expectedAnswer": "2, 3" },
-      { "id": "q2", "expression": "x^2 - 4 = 0", "expectedAnswer": "-2, 2" },
-      { "id": "q3", "expression": "x^2 + 2x + 1 = 0", "expectedAnswer": "-1" },
-      { "id": "q4", "expression": "x^2 + 4 = 0", "expectedAnswer": "אין פתרון ממשי" }
+      {
+        "id": "q1",
+        "expression": "x^2 - 5x + 6 = 0",
+        "expectedAnswer": "2, 3"
+      },
+      {
+        "id": "q2",
+        "expression": "x^2 - 4 = 0",
+        "expectedAnswer": "-2, 2"
+      },
+      {
+        "id": "q3",
+        "expression": "x^2 + 2x + 1 = 0",
+        "expectedAnswer": "-1"
+      },
+      {
+        "id": "q4",
+        "expression": "x^2 + 4 = 0",
+        "expectedAnswer": "אין פתרון ממשי"
+      },
+      {
+        "id": "q5",
+        "expression": "x^2 - 9x + 14 = 0",
+        "expectedAnswer": "2, 7"
+      },
+      {
+        "id": "q6",
+        "expression": "x^2 + 5x - 14 = 0",
+        "expectedAnswer": "-7, 2"
+      },
+      {
+        "id": "q7",
+        "expression": "x^2 - 2x + 1 = 0",
+        "expectedAnswer": "1"
+      },
+      {
+        "id": "q8",
+        "expression": "x^2 + 10x + 25 = 0",
+        "expectedAnswer": "-5"
+      },
+      {
+        "id": "q9",
+        "expression": "x^2 + 2x - 24 = 0",
+        "expectedAnswer": "-6, 4"
+      },
+      {
+        "id": "q10",
+        "expression": "x^2 - 7x + 10 = 0",
+        "expectedAnswer": "2, 5"
+      },
+      {
+        "id": "q11",
+        "expression": "x^2 + 3x - 10 = 0",
+        "expectedAnswer": "-5, 2"
+      },
+      {
+        "id": "q12",
+        "expression": "x^2 - 8x + 16 = 0",
+        "expectedAnswer": "4"
+      },
+      {
+        "id": "q13",
+        "expression": "x^2 + 6 = 0",
+        "expectedAnswer": "אין פתרון ממשי"
+      },
+      {
+        "id": "q14",
+        "expression": "x^2 - 5x - 14 = 0",
+        "expectedAnswer": "-2, 7"
+      },
+      {
+        "id": "q15",
+        "expression": "x^2 + 2x - 8 = 0",
+        "expectedAnswer": "-4, 2"
+      },
+      {
+        "id": "q16",
+        "expression": "x^2 - 3x - 18 = 0",
+        "expectedAnswer": "-3, 6"
+      },
+      {
+        "id": "q17",
+        "expression": "x^2 + 1 = 0",
+        "expectedAnswer": "אין פתרון ממשי"
+      },
+      {
+        "id": "q18",
+        "expression": "x^2 + 7x + 6 = 0",
+        "expectedAnswer": "-6, -1"
+      },
+      {
+        "id": "q19",
+        "expression": "x^2 + 3x + 2 = 0",
+        "expectedAnswer": "-2, -1"
+      },
+      {
+        "id": "q20",
+        "expression": "x^2 - 3x + 2 = 0",
+        "expectedAnswer": "1, 2"
+      },
+      {
+        "id": "q21",
+        "expression": "x^2 - 10x + 21 = 0",
+        "expectedAnswer": "3, 7"
+      },
+      {
+        "id": "q22",
+        "expression": "x^2 - 6x + 8 = 0",
+        "expectedAnswer": "2, 4"
+      },
+      {
+        "id": "q23",
+        "expression": "x^2 - 2x - 3 = 0",
+        "expectedAnswer": "-1, 3"
+      },
+      {
+        "id": "q24",
+        "expression": "x^2 + 3x - 28 = 0",
+        "expectedAnswer": "-7, 4"
+      },
+      {
+        "id": "q25",
+        "expression": "x^2 - 6x + 9 = 0",
+        "expectedAnswer": "3"
+      },
+      {
+        "id": "q26",
+        "expression": "x^2 - 11x + 30 = 0",
+        "expectedAnswer": "5, 6"
+      },
+      {
+        "id": "q27",
+        "expression": "x^2 - x - 42 = 0",
+        "expectedAnswer": "-6, 7"
+      },
+      {
+        "id": "q28",
+        "expression": "x^2 - 7x + 6 = 0",
+        "expectedAnswer": "1, 6"
+      },
+      {
+        "id": "q29",
+        "expression": "x^2 - 8x + 7 = 0",
+        "expectedAnswer": "1, 7"
+      },
+      {
+        "id": "q30",
+        "expression": "x^2 - x = 0",
+        "expectedAnswer": "0, 1"
+      },
+      {
+        "id": "q31",
+        "expression": "x^2 + x - 20 = 0",
+        "expectedAnswer": "-5, 4"
+      },
+      {
+        "id": "q32",
+        "expression": "x^2 - 8x + 12 = 0",
+        "expectedAnswer": "2, 6"
+      },
+      {
+        "id": "q33",
+        "expression": "x^2 + 5 = 0",
+        "expectedAnswer": "אין פתרון ממשי"
+      },
+      {
+        "id": "q34",
+        "expression": "x^2 + x - 6 = 0",
+        "expectedAnswer": "-3, 2"
+      },
+      {
+        "id": "q35",
+        "expression": "x^2 + 3 = 0",
+        "expectedAnswer": "אין פתרון ממשי"
+      },
+      {
+        "id": "q36",
+        "expression": "x^2 + 5x - 6 = 0",
+        "expectedAnswer": "-6, 1"
+      },
+      {
+        "id": "q37",
+        "expression": "x^2 - 10x + 25 = 0",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q38",
+        "expression": "x^2 + 5x = 0",
+        "expectedAnswer": "-5, 0"
+      },
+      {
+        "id": "q39",
+        "expression": "x^2 - 36 = 0",
+        "expectedAnswer": "-6, 6"
+      }
     ]
   },
   {
@@ -29,9 +411,201 @@
     "subject": "powersAlgebra",
     "difficulty": "easy",
     "questions": [
-      { "id": "q1", "expression": "x^2 * x^3", "expectedAnswer": "x^5" },
-      { "id": "q2", "expression": "(x^2)^3", "expectedAnswer": "x^6" },
-      { "id": "q3", "expression": "x^5 / x^2", "expectedAnswer": "x^3" }
+      {
+        "id": "q1",
+        "expression": "x^2 * x^3",
+        "expectedAnswer": "x^5"
+      },
+      {
+        "id": "q2",
+        "expression": "(x^2)^3",
+        "expectedAnswer": "x^6"
+      },
+      {
+        "id": "q3",
+        "expression": "x^5 / x^2",
+        "expectedAnswer": "x^3"
+      },
+      {
+        "id": "q4",
+        "expression": "x^6 / x^3",
+        "expectedAnswer": "x^3"
+      },
+      {
+        "id": "q5",
+        "expression": "x^5 / x^3",
+        "expectedAnswer": "x^2"
+      },
+      {
+        "id": "q6",
+        "expression": "x^5 * x^3",
+        "expectedAnswer": "x^8"
+      },
+      {
+        "id": "q7",
+        "expression": "x^3 * x^2",
+        "expectedAnswer": "x^5"
+      },
+      {
+        "id": "q8",
+        "expression": "x^4 / x^3",
+        "expectedAnswer": "x"
+      },
+      {
+        "id": "q9",
+        "expression": "x^6 * x^6",
+        "expectedAnswer": "x^12"
+      },
+      {
+        "id": "q10",
+        "expression": "x^5 / x^4",
+        "expectedAnswer": "x"
+      },
+      {
+        "id": "q11",
+        "expression": "x^9 / x^4",
+        "expectedAnswer": "x^5"
+      },
+      {
+        "id": "q12",
+        "expression": "x^6 * x^4",
+        "expectedAnswer": "x^10"
+      },
+      {
+        "id": "q13",
+        "expression": "x^1 * x^2",
+        "expectedAnswer": "x^3"
+      },
+      {
+        "id": "q14",
+        "expression": "x^9 / x^6",
+        "expectedAnswer": "x^3"
+      },
+      {
+        "id": "q15",
+        "expression": "(x^5)^3",
+        "expectedAnswer": "x^15"
+      },
+      {
+        "id": "q16",
+        "expression": "x^6 / x^4",
+        "expectedAnswer": "x^2"
+      },
+      {
+        "id": "q17",
+        "expression": "(x^2)^1",
+        "expectedAnswer": "x^2"
+      },
+      {
+        "id": "q18",
+        "expression": "x^3 * x^3",
+        "expectedAnswer": "x^6"
+      },
+      {
+        "id": "q19",
+        "expression": "x^5 * x^7",
+        "expectedAnswer": "x^12"
+      },
+      {
+        "id": "q20",
+        "expression": "(x^3)^4",
+        "expectedAnswer": "x^12"
+      },
+      {
+        "id": "q21",
+        "expression": "(x^2)^4",
+        "expectedAnswer": "x^8"
+      },
+      {
+        "id": "q22",
+        "expression": "x^1 * x^1",
+        "expectedAnswer": "x^2"
+      },
+      {
+        "id": "q23",
+        "expression": "(x^1)^3",
+        "expectedAnswer": "x^3"
+      },
+      {
+        "id": "q24",
+        "expression": "x^4 * x^3",
+        "expectedAnswer": "x^7"
+      },
+      {
+        "id": "q25",
+        "expression": "x^3 / x^2",
+        "expectedAnswer": "x"
+      },
+      {
+        "id": "q26",
+        "expression": "x^2 * x^4",
+        "expectedAnswer": "x^6"
+      },
+      {
+        "id": "q27",
+        "expression": "x^4 * x^5",
+        "expectedAnswer": "x^9"
+      },
+      {
+        "id": "q28",
+        "expression": "(x^3)^3",
+        "expectedAnswer": "x^9"
+      },
+      {
+        "id": "q29",
+        "expression": "x^7 * x^4",
+        "expectedAnswer": "x^11"
+      },
+      {
+        "id": "q30",
+        "expression": "x^7 * x^2",
+        "expectedAnswer": "x^9"
+      },
+      {
+        "id": "q31",
+        "expression": "(x^5)^4",
+        "expectedAnswer": "x^20"
+      },
+      {
+        "id": "q32",
+        "expression": "(x^4)^4",
+        "expectedAnswer": "x^16"
+      },
+      {
+        "id": "q33",
+        "expression": "x^6 / x^5",
+        "expectedAnswer": "x"
+      },
+      {
+        "id": "q34",
+        "expression": "(x^5)^2",
+        "expectedAnswer": "x^10"
+      },
+      {
+        "id": "q35",
+        "expression": "(x^3)^2",
+        "expectedAnswer": "x^6"
+      },
+      {
+        "id": "q36",
+        "expression": "(x^2)^2",
+        "expectedAnswer": "x^4"
+      },
+      {
+        "id": "q37",
+        "expression": "x^5 / x^1",
+        "expectedAnswer": "x^4"
+      },
+      {
+        "id": "q38",
+        "expression": "(x^1)^1",
+        "expectedAnswer": "x"
+      },
+      {
+        "id": "q39",
+        "expression": "x^4 / x^2",
+        "expectedAnswer": "x^2"
+      }
     ]
   },
   {
@@ -40,9 +614,201 @@
     "subject": "logarithmicEquations",
     "difficulty": "medium",
     "questions": [
-      { "id": "q1", "expression": "log_2(x+3) + log_2(x-3) = 4", "expectedAnswer": "5" },
-      { "id": "q2", "expression": "ln(x) + ln(x-2) = ln(3)", "expectedAnswer": "3" },
-      { "id": "q3", "expression": "log(x+2) - log(x-1) = 1", "expectedAnswer": "4/3" }
+      {
+        "id": "q1",
+        "expression": "log_2(x+3) + log_2(x-3) = 4",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q2",
+        "expression": "ln(x) + ln(x-2) = ln(3)",
+        "expectedAnswer": "3"
+      },
+      {
+        "id": "q3",
+        "expression": "log(x+2) - log(x-1) = 1",
+        "expectedAnswer": "4/3"
+      },
+      {
+        "id": "q4",
+        "expression": "log(x+4) - log(x-3) = 1",
+        "expectedAnswer": "34/9"
+      },
+      {
+        "id": "q5",
+        "expression": "ln(x) + ln(x-2) = ln(35)",
+        "expectedAnswer": "7"
+      },
+      {
+        "id": "q6",
+        "expression": "log(x+7) - log(x-4) = 1",
+        "expectedAnswer": "47/9"
+      },
+      {
+        "id": "q7",
+        "expression": "log_3(x+3) + log_3(x-3) = 3",
+        "expectedAnswer": "6"
+      },
+      {
+        "id": "q8",
+        "expression": "ln(x) + ln(x-5) = ln(6)",
+        "expectedAnswer": "6"
+      },
+      {
+        "id": "q9",
+        "expression": "log(x+1) - log(x-2) = 1",
+        "expectedAnswer": "7/3"
+      },
+      {
+        "id": "q10",
+        "expression": "ln(x) + ln(x-5) = ln(36)",
+        "expectedAnswer": "9"
+      },
+      {
+        "id": "q11",
+        "expression": "log(x+8) - log(x-4) = 1",
+        "expectedAnswer": "16/3"
+      },
+      {
+        "id": "q12",
+        "expression": "log_2(x) = 3",
+        "expectedAnswer": "8"
+      },
+      {
+        "id": "q13",
+        "expression": "ln(x) + ln(x-4) = ln(45)",
+        "expectedAnswer": "9"
+      },
+      {
+        "id": "q14",
+        "expression": "log(x+3) - log(x-5) = 1",
+        "expectedAnswer": "53/9"
+      },
+      {
+        "id": "q15",
+        "expression": "log_3(x+4) + log_3(x-4) = 2",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q16",
+        "expression": "ln(x) + ln(x-3) = ln(28)",
+        "expectedAnswer": "7"
+      },
+      {
+        "id": "q17",
+        "expression": "ln(x) + ln(x-2) = ln(48)",
+        "expectedAnswer": "8"
+      },
+      {
+        "id": "q18",
+        "expression": "log(x+3) - log(x-1) = 1",
+        "expectedAnswer": "13/9"
+      },
+      {
+        "id": "q19",
+        "expression": "ln(x) + ln(x-5) = ln(14)",
+        "expectedAnswer": "7"
+      },
+      {
+        "id": "q20",
+        "expression": "log_3(x) = 4",
+        "expectedAnswer": "81"
+      },
+      {
+        "id": "q21",
+        "expression": "log_3(x) = 3",
+        "expectedAnswer": "27"
+      },
+      {
+        "id": "q22",
+        "expression": "log_5(x) = 4",
+        "expectedAnswer": "625"
+      },
+      {
+        "id": "q23",
+        "expression": "ln(x) + ln(x-2) = ln(8)",
+        "expectedAnswer": "4"
+      },
+      {
+        "id": "q24",
+        "expression": "ln(x) + ln(x-1) = ln(20)",
+        "expectedAnswer": "5"
+      },
+      {
+        "id": "q25",
+        "expression": "log(x+8) - log(x-3) = 1",
+        "expectedAnswer": "38/9"
+      },
+      {
+        "id": "q26",
+        "expression": "log(x+8) - log(x-1) = 1",
+        "expectedAnswer": "2"
+      },
+      {
+        "id": "q27",
+        "expression": "log(x+5) - log(x-3) = 1",
+        "expectedAnswer": "35/9"
+      },
+      {
+        "id": "q28",
+        "expression": "log_2(x+7) + log_2(x-7) = 5",
+        "expectedAnswer": "9"
+      },
+      {
+        "id": "q29",
+        "expression": "ln(x) + ln(x-1) = ln(2)",
+        "expectedAnswer": "2"
+      },
+      {
+        "id": "q30",
+        "expression": "log(x+4) - log(x-1) = 1",
+        "expectedAnswer": "14/9"
+      },
+      {
+        "id": "q31",
+        "expression": "log(x+1) - log(x-4) = 1",
+        "expectedAnswer": "41/9"
+      },
+      {
+        "id": "q32",
+        "expression": "log(x+2) - log(x-4) = 1",
+        "expectedAnswer": "14/3"
+      },
+      {
+        "id": "q33",
+        "expression": "ln(x) + ln(x-4) = ln(21)",
+        "expectedAnswer": "7"
+      },
+      {
+        "id": "q34",
+        "expression": "ln(x) + ln(x-2) = ln(24)",
+        "expectedAnswer": "6"
+      },
+      {
+        "id": "q35",
+        "expression": "log_5(x) = 3",
+        "expectedAnswer": "125"
+      },
+      {
+        "id": "q36",
+        "expression": "log(x+2) - log(x-3) = 1",
+        "expectedAnswer": "32/9"
+      },
+      {
+        "id": "q37",
+        "expression": "ln(x) + ln(x-5) = ln(24)",
+        "expectedAnswer": "8"
+      },
+      {
+        "id": "q38",
+        "expression": "log_2(x) = 2",
+        "expectedAnswer": "4"
+      },
+      {
+        "id": "q39",
+        "expression": "ln(x) + ln(x-3) = ln(4)",
+        "expectedAnswer": "4"
+      }
     ]
   },
   {
@@ -51,10 +817,291 @@
     "subject": "functionAnalysis",
     "difficulty": "medium",
     "questions": [
-      { "id": "q1", "expression": "x^3 - 3x^2", "expectedAnswer": "3x^2 - 6x" },
-      { "id": "q2", "expression": "x^3 - 3x + 1", "expectedAnswer": "3x^2 - 3" },
-      { "id": "q3", "expression": "x^4 - 4x^2", "expectedAnswer": "4x^3 - 8x" },
-      { "id": "q4", "expression": "-x^2 + 4x", "expectedAnswer": "-2x + 4" }
+      {
+        "id": "q1",
+        "expression": "x^3 - 6x^2 - 15x + 1",
+        "expectedAnswer": "מקסימום (-1, 9), מינימום (5, -99)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q2",
+        "expression": "x^3 - 3x^2",
+        "expectedAnswer": "3x^2 - 6x"
+      },
+      {
+        "id": "q3",
+        "expression": "x^3 - 3x + 1",
+        "expectedAnswer": "3x^2 - 3"
+      },
+      {
+        "id": "q4",
+        "expression": "x^4 - 4x^2",
+        "expectedAnswer": "4x^3 - 8x"
+      },
+      {
+        "id": "q5",
+        "expression": "x^3 + 12x^2 + 45x + 5",
+        "expectedAnswer": "מקסימום (-5, -45), מינימום (-3, -49)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q6",
+        "expression": "-x^2 + 4x",
+        "expectedAnswer": "-2x + 4"
+      },
+      {
+        "id": "q7",
+        "expression": "4x^2 + 3x + 5",
+        "expectedAnswer": "8x + 3"
+      },
+      {
+        "id": "q8",
+        "expression": "3x^3 + 3",
+        "expectedAnswer": "9x^2"
+      },
+      {
+        "id": "q9",
+        "expression": "x^3 + 3x^2 - 24x + 3",
+        "expectedAnswer": "מקסימום (-4, 83), מינימום (2, -25)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q10",
+        "expression": "-x^2 - 4x",
+        "expectedAnswer": "-2x - 4"
+      },
+      {
+        "id": "q11",
+        "expression": "-4x^2 - 4x",
+        "expectedAnswer": "-8x - 4"
+      },
+      {
+        "id": "q12",
+        "expression": "x^3 - 75x + 5",
+        "expectedAnswer": "מקסימום (-5, 255), מינימום (5, -245)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q13",
+        "expression": "-2x^3 + 5x - 4",
+        "expectedAnswer": "-6x^2 + 5"
+      },
+      {
+        "id": "q14",
+        "expression": "4x^2 + 2x + 1",
+        "expectedAnswer": "8x + 2"
+      },
+      {
+        "id": "q15",
+        "expression": "-4x^4 - 5x^3 - 3",
+        "expectedAnswer": "-16x^3 - 15x^2"
+      },
+      {
+        "id": "q16",
+        "expression": "x^3 + 3x^2 - 24x + 4",
+        "expectedAnswer": "מקסימום (-4, 84), מינימום (2, -24)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q17",
+        "expression": "x^3 + 2",
+        "expectedAnswer": "3x^2"
+      },
+      {
+        "id": "q18",
+        "expression": "5x^3 - x^2",
+        "expectedAnswer": "15x^2 - 2x"
+      },
+      {
+        "id": "q19",
+        "expression": "x^3 - 12x - 4",
+        "expectedAnswer": "מקסימום (-2, 12), מינימום (2, -20)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q20",
+        "expression": "3x^3 - 3x^2 + 3",
+        "expectedAnswer": "9x^2 - 6x"
+      },
+      {
+        "id": "q21",
+        "expression": "2x^4 + 2x^2",
+        "expectedAnswer": "8x^3 + 4x"
+      },
+      {
+        "id": "q22",
+        "expression": "-3x^4 - 2x + 5",
+        "expectedAnswer": "-12x^3 - 2"
+      },
+      {
+        "id": "q23",
+        "expression": "x^3 - 3x^2 - 24x - 6",
+        "expectedAnswer": "מקסימום (-2, 22), מינימום (4, -86)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q24",
+        "expression": "-3x^2 + 5x - 1",
+        "expectedAnswer": "-6x + 5"
+      },
+      {
+        "id": "q25",
+        "expression": "-x^4 + x^2",
+        "expectedAnswer": "-4x^3 + 2x"
+      },
+      {
+        "id": "q26",
+        "expression": "4x^4 + 2x^2 - 5x",
+        "expectedAnswer": "16x^3 + 4x - 5"
+      },
+      {
+        "id": "q27",
+        "expression": "x^3 - 12x + 3",
+        "expectedAnswer": "מקסימום (-2, 19), מינימום (2, -13)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q28",
+        "expression": "5x^2 - 4x + 3",
+        "expectedAnswer": "10x - 4"
+      },
+      {
+        "id": "q29",
+        "expression": "-4x^4 - 5x^3",
+        "expectedAnswer": "-16x^3 - 15x^2"
+      },
+      {
+        "id": "q30",
+        "expression": "x^3 + 12x^2 + 45x - 5",
+        "expectedAnswer": "מקסימום (-5, -55), מינימום (-3, -59)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q31",
+        "expression": "x^3 - 4",
+        "expectedAnswer": "3x^2"
+      },
+      {
+        "id": "q32",
+        "expression": "-2x^2 - 5x - 5",
+        "expectedAnswer": "-4x - 5"
+      },
+      {
+        "id": "q33",
+        "expression": "-2x^3 - 4",
+        "expectedAnswer": "-6x^2"
+      },
+      {
+        "id": "q34",
+        "expression": "x^3 + 3x^2 - 24x - 6",
+        "expectedAnswer": "מקסימום (-4, 74), מינימום (2, -34)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q35",
+        "expression": "-x^4 - 3x - 2",
+        "expectedAnswer": "-4x^3 - 3"
+      },
+      {
+        "id": "q36",
+        "expression": "-3x^2 - 3x",
+        "expectedAnswer": "-6x - 3"
+      },
+      {
+        "id": "q37",
+        "expression": "x^3 - 3x^2 - 1",
+        "expectedAnswer": "מקסימום (0, -1), מינימום (2, -5)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q38",
+        "expression": "2x^4 + 4x + 4",
+        "expectedAnswer": "8x^3 + 4"
+      },
+      {
+        "id": "q39",
+        "expression": "-3x^2 + 4x - 5",
+        "expectedAnswer": "-6x + 4"
+      },
+      {
+        "id": "q40",
+        "expression": "-2x^3 - x + 4",
+        "expectedAnswer": "-6x^2 - 1"
+      },
+      {
+        "id": "q41",
+        "expression": "x^3 - 6x^2 + 1",
+        "expectedAnswer": "מקסימום (0, 1), מינימום (4, -31)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q42",
+        "expression": "x^2 - 5x - 4",
+        "expectedAnswer": "2x - 5"
+      },
+      {
+        "id": "q43",
+        "expression": "-x^2 + 2x - 1",
+        "expectedAnswer": "-2x + 2"
+      },
+      {
+        "id": "q44",
+        "expression": "-4x^4 + 2x^2",
+        "expectedAnswer": "-16x^3 + 4x"
+      },
+      {
+        "id": "q45",
+        "expression": "x^3 - 3x^2 - 9x + 5",
+        "expectedAnswer": "מקסימום (-1, 10), מינימום (3, -22)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q46",
+        "expression": "-2x^3 + 3x",
+        "expectedAnswer": "-6x^2 + 3"
+      },
+      {
+        "id": "q47",
+        "expression": "x^3 + 4x^2 + 3",
+        "expectedAnswer": "3x^2 + 8x"
+      },
+      {
+        "id": "q48",
+        "expression": "x^3 - 6x^2 + 9x + 3",
+        "expectedAnswer": "מקסימום (1, 7), מינימום (3, 3)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q49",
+        "expression": "-5x^2 + 4x + 2",
+        "expectedAnswer": "-10x + 4"
+      },
+      {
+        "id": "q50",
+        "expression": "x^3 + 4x",
+        "expectedAnswer": "3x^2 + 4"
+      },
+      {
+        "id": "q51",
+        "expression": "-x^2 - 3x",
+        "expectedAnswer": "-2x - 3"
+      },
+      {
+        "id": "q52",
+        "expression": "x^3 - 9x^2 + 15x - 3",
+        "expectedAnswer": "מקסימום (1, 4), מינימום (5, -28)",
+        "mode": "extrema"
+      },
+      {
+        "id": "q53",
+        "expression": "3x^3 - 3x^2 - 2",
+        "expectedAnswer": "9x^2 - 6x"
+      },
+      {
+        "id": "q54",
+        "expression": "x^2 - x",
+        "expectedAnswer": "2x - 1"
+      }
     ]
   },
   {
@@ -63,9 +1110,201 @@
     "subject": "circleGeometry",
     "difficulty": "medium",
     "questions": [
-      { "id": "q1", "expression": "x^2+y^2-4x+6y-3=0", "expectedAnswer": "2, -3, 4" },
-      { "id": "q2", "expression": "x^2+y^2-9=0", "expectedAnswer": "0, 0, 3" },
-      { "id": "q3", "expression": "x^2+(y-3)^2=25", "expectedAnswer": "0, 3, 5" }
+      {
+        "id": "q1",
+        "expression": "x^2+y^2-4x+6y-3=0",
+        "expectedAnswer": "2, -3, 4"
+      },
+      {
+        "id": "q2",
+        "expression": "x^2+y^2-9=0",
+        "expectedAnswer": "0, 0, 3"
+      },
+      {
+        "id": "q3",
+        "expression": "x^2+(y-3)^2=25",
+        "expectedAnswer": "0, 3, 5"
+      },
+      {
+        "id": "q4",
+        "expression": "x^2+y^2-10x-11=0",
+        "expectedAnswer": "5, 0, 6"
+      },
+      {
+        "id": "q5",
+        "expression": "x^2+y^2-8x+10y+25=0",
+        "expectedAnswer": "4, -5, 4"
+      },
+      {
+        "id": "q6",
+        "expression": "x^2+y^2-10x+2y-38=0",
+        "expectedAnswer": "5, -1, 8"
+      },
+      {
+        "id": "q7",
+        "expression": "x^2+y^2-10x+12y+45=0",
+        "expectedAnswer": "5, -6, 4"
+      },
+      {
+        "id": "q8",
+        "expression": "x^2+y^2-4x+6y-51=0",
+        "expectedAnswer": "2, -3, 8"
+      },
+      {
+        "id": "q9",
+        "expression": "x^2+y^2+10x-4y-7=0",
+        "expectedAnswer": "-5, 2, 6"
+      },
+      {
+        "id": "q10",
+        "expression": "x^2+y^2-4x+6y+12=0",
+        "expectedAnswer": "2, -3, 1"
+      },
+      {
+        "id": "q11",
+        "expression": "x^2+y^2+2x+10y+25=0",
+        "expectedAnswer": "-1, -5, 1"
+      },
+      {
+        "id": "q12",
+        "expression": "x^2+y^2-2x-6y-26=0",
+        "expectedAnswer": "1, 3, 6"
+      },
+      {
+        "id": "q13",
+        "expression": "x^2+y^2-2y-48=0",
+        "expectedAnswer": "0, 1, 7"
+      },
+      {
+        "id": "q14",
+        "expression": "x^2+y^2-4x+10y-7=0",
+        "expectedAnswer": "2, -5, 6"
+      },
+      {
+        "id": "q15",
+        "expression": "x^2+y^2-10x+12y+60=0",
+        "expectedAnswer": "5, -6, 1"
+      },
+      {
+        "id": "q16",
+        "expression": "x^2+y^2-10x+8y-23=0",
+        "expectedAnswer": "5, -4, 8"
+      },
+      {
+        "id": "q17",
+        "expression": "x^2+y^2-12x+12y+56=0",
+        "expectedAnswer": "6, -6, 4"
+      },
+      {
+        "id": "q18",
+        "expression": "x^2+y^2+6x+6y-18=0",
+        "expectedAnswer": "-3, -3, 6"
+      },
+      {
+        "id": "q19",
+        "expression": "x^2+y^2+8x-4y-29=0",
+        "expectedAnswer": "-4, 2, 7"
+      },
+      {
+        "id": "q20",
+        "expression": "x^2+y^2-2x-6y+6=0",
+        "expectedAnswer": "1, 3, 2"
+      },
+      {
+        "id": "q21",
+        "expression": "x^2+y^2-4x+4y-41=0",
+        "expectedAnswer": "2, -2, 7"
+      },
+      {
+        "id": "q22",
+        "expression": "x^2+y^2-8y+7=0",
+        "expectedAnswer": "0, 4, 3"
+      },
+      {
+        "id": "q23",
+        "expression": "x^2+y^2+8x+10y+5=0",
+        "expectedAnswer": "-4, -5, 6"
+      },
+      {
+        "id": "q24",
+        "expression": "x^2+y^2+4x+3=0",
+        "expectedAnswer": "-2, 0, 1"
+      },
+      {
+        "id": "q25",
+        "expression": "x^2+y^2-10x+2y-23=0",
+        "expectedAnswer": "5, -1, 7"
+      },
+      {
+        "id": "q26",
+        "expression": "x^2+y^2+10x-8y+32=0",
+        "expectedAnswer": "-5, 4, 3"
+      },
+      {
+        "id": "q27",
+        "expression": "x^2+y^2+8x+4y+4=0",
+        "expectedAnswer": "-4, -2, 4"
+      },
+      {
+        "id": "q28",
+        "expression": "x^2+y^2+2x+12y+21=0",
+        "expectedAnswer": "-1, -6, 4"
+      },
+      {
+        "id": "q29",
+        "expression": "x^2+y^2-4x-8y+4=0",
+        "expectedAnswer": "2, 4, 4"
+      },
+      {
+        "id": "q30",
+        "expression": "x^2+y^2+2x-6y+1=0",
+        "expectedAnswer": "-1, 3, 3"
+      },
+      {
+        "id": "q31",
+        "expression": "x^2+y^2-4x-4y+4=0",
+        "expectedAnswer": "2, 2, 2"
+      },
+      {
+        "id": "q32",
+        "expression": "x^2+y^2-8x-12y+48=0",
+        "expectedAnswer": "4, 6, 2"
+      },
+      {
+        "id": "q33",
+        "expression": "x^2+y^2+4x-12y+4=0",
+        "expectedAnswer": "-2, 6, 6"
+      },
+      {
+        "id": "q34",
+        "expression": "x^2+y^2+4x-10y+28=0",
+        "expectedAnswer": "-2, 5, 1"
+      },
+      {
+        "id": "q35",
+        "expression": "x^2+y^2-2x+2y-62=0",
+        "expectedAnswer": "1, -1, 8"
+      },
+      {
+        "id": "q36",
+        "expression": "x^2+y^2-6x-12y-19=0",
+        "expectedAnswer": "3, 6, 8"
+      },
+      {
+        "id": "q37",
+        "expression": "x^2+y^2+4y-60=0",
+        "expectedAnswer": "0, -2, 8"
+      },
+      {
+        "id": "q38",
+        "expression": "x^2+y^2+12x-12y+23=0",
+        "expectedAnswer": "-6, 6, 7"
+      },
+      {
+        "id": "q39",
+        "expression": "x^2+y^2-4x-6y-23=0",
+        "expectedAnswer": "2, 3, 6"
+      }
     ]
   },
   {
@@ -74,9 +1313,201 @@
     "subject": "systemOfEquations",
     "difficulty": "medium",
     "questions": [
-      { "id": "q1", "expression": "x + y = 5 | 2x - y = 1", "expectedAnswer": "x=2, y=3" },
-      { "id": "q2", "expression": "2x + 3y = 12 | x - y = 1", "expectedAnswer": "x=3, y=2" },
-      { "id": "q3", "expression": "x - y = 2 | x + y = 8", "expectedAnswer": "x=5, y=3" }
+      {
+        "id": "q1",
+        "expression": "x + y = 5 | 2x - y = 1",
+        "expectedAnswer": "x=2, y=3"
+      },
+      {
+        "id": "q2",
+        "expression": "2x + 3y = 12 | x - y = 1",
+        "expectedAnswer": "x=3, y=2"
+      },
+      {
+        "id": "q3",
+        "expression": "x - y = 2 | x + y = 8",
+        "expectedAnswer": "x=5, y=3"
+      },
+      {
+        "id": "q4",
+        "expression": "5x + 2y = -22 | -4x - 3y = 12",
+        "expectedAnswer": "x=-6, y=4"
+      },
+      {
+        "id": "q5",
+        "expression": "5x + 3y = 0 | 5x + 4y = -5",
+        "expectedAnswer": "x=3, y=-5"
+      },
+      {
+        "id": "q6",
+        "expression": "-2x + 5y = -8 | 2x - 4y = 4",
+        "expectedAnswer": "x=-6, y=-4"
+      },
+      {
+        "id": "q7",
+        "expression": "2x - 4y = -10 | 5x - 5y = 5",
+        "expectedAnswer": "x=7, y=6"
+      },
+      {
+        "id": "q8",
+        "expression": "-4x + 5y = -47 | -5x - 5y = -25",
+        "expectedAnswer": "x=8, y=-3"
+      },
+      {
+        "id": "q9",
+        "expression": "2x - 4y = -24 | 3x + 2y = -12",
+        "expectedAnswer": "x=-6, y=3"
+      },
+      {
+        "id": "q10",
+        "expression": "-5x - 4y = -67 | 5x - 2y = 19",
+        "expectedAnswer": "x=7, y=8"
+      },
+      {
+        "id": "q11",
+        "expression": "-3x + 3y = 33 | -4x - 5y = -1",
+        "expectedAnswer": "x=-6, y=5"
+      },
+      {
+        "id": "q12",
+        "expression": "-2x - 5y = 6 | -4x + 2y = -12",
+        "expectedAnswer": "x=2, y=-2"
+      },
+      {
+        "id": "q13",
+        "expression": "4x - 4y = 20 | 4x - 2y = 20",
+        "expectedAnswer": "x=5, y=0"
+      },
+      {
+        "id": "q14",
+        "expression": "-3x - 4y = -12 | 5x - 4y = 52",
+        "expectedAnswer": "x=8, y=-3"
+      },
+      {
+        "id": "q15",
+        "expression": "-4x + 2y = 40 | -4x - 2y = 8",
+        "expectedAnswer": "x=-6, y=8"
+      },
+      {
+        "id": "q16",
+        "expression": "4x - 5y = 27 | -5x - 2y = -9",
+        "expectedAnswer": "x=3, y=-3"
+      },
+      {
+        "id": "q17",
+        "expression": "-2x - 3y = 21 | -5x - 5y = 45",
+        "expectedAnswer": "x=-6, y=-3"
+      },
+      {
+        "id": "q18",
+        "expression": "-3x - 4y = 0 | 4x - 3y = 50",
+        "expectedAnswer": "x=8, y=-6"
+      },
+      {
+        "id": "q19",
+        "expression": "3x + 3y = -18 | -4x + 2y = 18",
+        "expectedAnswer": "x=-5, y=-1"
+      },
+      {
+        "id": "q20",
+        "expression": "2x - 4y = -8 | -2x + 3y = 8",
+        "expectedAnswer": "x=-4, y=0"
+      },
+      {
+        "id": "q21",
+        "expression": "-5x - 2y = 2 | 2x + 2y = 4",
+        "expectedAnswer": "x=-2, y=4"
+      },
+      {
+        "id": "q22",
+        "expression": "5x - 5y = -40 | -5x - 4y = -14",
+        "expectedAnswer": "x=-2, y=6"
+      },
+      {
+        "id": "q23",
+        "expression": "-2x - 5y = -49 | -3x + 2y = -7",
+        "expectedAnswer": "x=7, y=7"
+      },
+      {
+        "id": "q24",
+        "expression": "5x - 4y = 3 | 4x + 4y = 24",
+        "expectedAnswer": "x=3, y=3"
+      },
+      {
+        "id": "q25",
+        "expression": "3x - 2y = -16 | -3x - 4y = 22",
+        "expectedAnswer": "x=-6, y=-1"
+      },
+      {
+        "id": "q26",
+        "expression": "5x - 4y = -38 | 2x + 2y = 10",
+        "expectedAnswer": "x=-2, y=7"
+      },
+      {
+        "id": "q27",
+        "expression": "2x + 5y = 16 | 3x - 5y = -26",
+        "expectedAnswer": "x=-2, y=4"
+      },
+      {
+        "id": "q28",
+        "expression": "5x - 3y = 1 | 4x - 5y = -7",
+        "expectedAnswer": "x=2, y=3"
+      },
+      {
+        "id": "q29",
+        "expression": "3x - 2y = 12 | 3x + 2y = 0",
+        "expectedAnswer": "x=2, y=-3"
+      },
+      {
+        "id": "q30",
+        "expression": "-3x + 3y = 15 | -2x + 4y = 22",
+        "expectedAnswer": "x=1, y=6"
+      },
+      {
+        "id": "q31",
+        "expression": "-3x - 4y = 23 | -2x - 4y = 22",
+        "expectedAnswer": "x=-1, y=-5"
+      },
+      {
+        "id": "q32",
+        "expression": "2x - 5y = -40 | 4x + 5y = 40",
+        "expectedAnswer": "x=0, y=8"
+      },
+      {
+        "id": "q33",
+        "expression": "-2x - 5y = 27 | 4x - 3y = 11",
+        "expectedAnswer": "x=-1, y=-5"
+      },
+      {
+        "id": "q34",
+        "expression": "2x + 4y = 42 | 5x - 2y = 9",
+        "expectedAnswer": "x=5, y=8"
+      },
+      {
+        "id": "q35",
+        "expression": "-3x - 3y = -6 | -5x + 2y = -3",
+        "expectedAnswer": "x=1, y=1"
+      },
+      {
+        "id": "q36",
+        "expression": "-5x + 4y = 8 | -3x - 2y = -4",
+        "expectedAnswer": "x=0, y=2"
+      },
+      {
+        "id": "q37",
+        "expression": "3x + 5y = -17 | 3x - 4y = 19",
+        "expectedAnswer": "x=1, y=-4"
+      },
+      {
+        "id": "q38",
+        "expression": "-5x + 2y = 42 | -2x - 2y = 0",
+        "expectedAnswer": "x=-6, y=6"
+      },
+      {
+        "id": "q39",
+        "expression": "3x - 5y = 39 | 2x - 2y = 22",
+        "expectedAnswer": "x=8, y=-3"
+      }
     ]
   },
   {
@@ -85,8 +1516,201 @@
     "subject": "systemOf3Equations",
     "difficulty": "hard",
     "questions": [
-      { "id": "q1", "expression": "x + y + z = 6 | 2x - y + z = 3 | x + 2y - z = 2", "expectedAnswer": "x=1, y=2, z=3" },
-      { "id": "q2", "expression": "x + y + z = 6 | x - y + z = 0 | x + y - z = 2", "expectedAnswer": "x=1, y=3, z=2" }
+      {
+        "id": "q1",
+        "expression": "x + y + z = 6 | 2x - y + z = 3 | x + 2y - z = 2",
+        "expectedAnswer": "x=1, y=2, z=3"
+      },
+      {
+        "id": "q2",
+        "expression": "x + y + z = 6 | x - y + z = 0 | x + y - z = 2",
+        "expectedAnswer": "x=1, y=3, z=2"
+      },
+      {
+        "id": "q3",
+        "expression": "-3x + y - z = -3 | x - 3y + 2z = -8 | -3x + y + z = -1",
+        "expectedAnswer": "x=2, y=4, z=1"
+      },
+      {
+        "id": "q4",
+        "expression": "-3x - 2y - z = -2 | -2x + y - 3z = 1 | 3x + 3y + z = 1",
+        "expectedAnswer": "x=2, y=-1, z=-2"
+      },
+      {
+        "id": "q5",
+        "expression": "-3x - 3y - 3z = -3 | 3x - y - 3z = 21 | -x + 2y + 3z = -12",
+        "expectedAnswer": "x=3, y=3, z=-5"
+      },
+      {
+        "id": "q6",
+        "expression": "-x - 2y + z = -6 | -x + y - z = 2 | -2x - y - 2z = 4",
+        "expectedAnswer": "x=2, y=0, z=-4"
+      },
+      {
+        "id": "q7",
+        "expression": "-2x + 2y + 2z = 4 | 2x - y + 2z = -7 | x + 2y + 3z = 5",
+        "expectedAnswer": "x=1, y=5, z=-2"
+      },
+      {
+        "id": "q8",
+        "expression": "3x + y + 2z = -18 | x - y + z = -1 | -x + y + 3z = -3",
+        "expectedAnswer": "x=-4, y=-4, z=-1"
+      },
+      {
+        "id": "q9",
+        "expression": "x - y + z = 10 | -x - 2y - 3z = -10 | 3x - 3y - z = 6",
+        "expectedAnswer": "x=0, y=-4, z=6"
+      },
+      {
+        "id": "q10",
+        "expression": "3x - 2y + 3z = -7 | -x + 2y - z = 5 | x - 3y - 3z = 13",
+        "expectedAnswer": "x=4, y=2, z=-5"
+      },
+      {
+        "id": "q11",
+        "expression": "x - 3y + 2z = 2 | -3x - 3y - z = 10 | x - 2y - 2z = 15",
+        "expectedAnswer": "x=1, y=-3, z=-4"
+      },
+      {
+        "id": "q12",
+        "expression": "-x + 2y + 3z = 17 | x - y + 3z = 5 | 2x - y - 3z = -13",
+        "expectedAnswer": "x=0, y=4, z=3"
+      },
+      {
+        "id": "q13",
+        "expression": "-2x - 3y + z = 24 | -3x - 2y + 3z = 28 | -x + y + z = 1",
+        "expectedAnswer": "x=-3, y=-5, z=3"
+      },
+      {
+        "id": "q14",
+        "expression": "3x - y - 3z = 1 | -3x - 3y + z = 9 | 3x + y + 3z = -19",
+        "expectedAnswer": "x=-3, y=-1, z=-3"
+      },
+      {
+        "id": "q15",
+        "expression": "2x + y + 3z = 0 | -3x + 2y + z = -5 | 2x + 2y + 3z = -3",
+        "expectedAnswer": "x=0, y=-3, z=1"
+      },
+      {
+        "id": "q16",
+        "expression": "-x - y + 3z = 6 | 3x - y + z = 12 | -3x - 3y - 3z = -18",
+        "expectedAnswer": "x=3, y=0, z=3"
+      },
+      {
+        "id": "q17",
+        "expression": "-x + 3y + z = 15 | -3x + y + z = 7 | 3x - 2y - z = -12",
+        "expectedAnswer": "x=-1, y=5, z=-1"
+      },
+      {
+        "id": "q18",
+        "expression": "2x - y - 3z = -7 | -2x - 3y + 3z = -5 | x + y - 3z = -2",
+        "expectedAnswer": "x=1, y=3, z=2"
+      },
+      {
+        "id": "q19",
+        "expression": "-x - y + 2z = -11 | -x - y - z = -2 | -2x - 3y - z = -8",
+        "expectedAnswer": "x=4, y=1, z=-3"
+      },
+      {
+        "id": "q20",
+        "expression": "2x - 2y + 2z = 12 | x + 2y + z = -6 | -2x - 3y - 3z = 2",
+        "expectedAnswer": "x=-4, y=-4, z=6"
+      },
+      {
+        "id": "q21",
+        "expression": "2x + 3y - 2z = -11 | 2x - 3y + z = 4 | -3x + 2y + 2z = -2",
+        "expectedAnswer": "x=-2, y=-3, z=-1"
+      },
+      {
+        "id": "q22",
+        "expression": "-3x + 2y - 2z = 11 | x + 2y + z = -8 | -x - 3y - 3z = 19",
+        "expectedAnswer": "x=-1, y=-1, z=-5"
+      },
+      {
+        "id": "q23",
+        "expression": "-2x + 3y + z = -6 | -3x + 3y - 3z = -30 | -3x - 3y - 3z = -6",
+        "expectedAnswer": "x=0, y=-4, z=6"
+      },
+      {
+        "id": "q24",
+        "expression": "-3x - 2y + 2z = 10 | x - 2y + 2z = 18 | -x - 3y - 2z = -3",
+        "expectedAnswer": "x=2, y=-3, z=5"
+      },
+      {
+        "id": "q25",
+        "expression": "x + 2y + 3z = 6 | 2x - 2y + z = 1 | x - 2y - 2z = -3",
+        "expectedAnswer": "x=1, y=1, z=1"
+      },
+      {
+        "id": "q26",
+        "expression": "2x - 3y + z = 22 | -x - 3y - 2z = -2 | -2x + 3y + 2z = -13",
+        "expectedAnswer": "x=5, y=-3, z=3"
+      },
+      {
+        "id": "q27",
+        "expression": "-2x - 3y - 2z = 8 | 3x - 2y + 3z = -12 | -2x + 3y - z = 4",
+        "expectedAnswer": "x=0, y=0, z=-4"
+      },
+      {
+        "id": "q28",
+        "expression": "-3x - y + 3z = 1 | -2x + 2y + 2z = -10 | 3x - 3y - 2z = 17",
+        "expectedAnswer": "x=3, y=-4, z=2"
+      },
+      {
+        "id": "q29",
+        "expression": "-3x + 3y + 3z = 15 | -2x + y + 2z = 8 | -3x + 2y - 2z = 23",
+        "expectedAnswer": "x=-5, y=2, z=-2"
+      },
+      {
+        "id": "q30",
+        "expression": "2x + 2y + 3z = -7 | 2x + y + z = -5 | -2x - 3y + z = 3",
+        "expectedAnswer": "x=-2, y=0, z=-1"
+      },
+      {
+        "id": "q31",
+        "expression": "2x + y + 2z = 8 | 2x + 3y - z = 15 | -2x - y - z = -9",
+        "expectedAnswer": "x=4, y=2, z=-1"
+      },
+      {
+        "id": "q32",
+        "expression": "x + 3y + z = -1 | 3x + y + 3z = -11 | 3x - 3y + z = -17",
+        "expectedAnswer": "x=-5, y=1, z=1"
+      },
+      {
+        "id": "q33",
+        "expression": "-x + y - z = -4 | 3x - 2y - 2z = 18 | -3x + y - 2z = -15",
+        "expectedAnswer": "x=6, y=1, z=-1"
+      },
+      {
+        "id": "q34",
+        "expression": "x + y + 3z = 6 | -x - y - 2z = -5 | x + 3y + 2z = 11",
+        "expectedAnswer": "x=0, y=3, z=1"
+      },
+      {
+        "id": "q35",
+        "expression": "2x + 3y + 3z = -19 | x + 3y + 3z = -17 | 2x - y + z = -3",
+        "expectedAnswer": "x=-2, y=-3, z=-2"
+      },
+      {
+        "id": "q36",
+        "expression": "x - y + z = -5 | x - 2y + 3z = -12 | 3x - 3y + 2z = -13",
+        "expectedAnswer": "x=0, y=3, z=-2"
+      },
+      {
+        "id": "q37",
+        "expression": "x + 2y - 3z = -7 | 2x - 2y - 3z = -32 | 2x - 3y - 3z = -37",
+        "expectedAnswer": "x=-5, y=5, z=4"
+      },
+      {
+        "id": "q38",
+        "expression": "x + y - 3z = -12 | -x - y - z = -4 | -3x - 2y - 3z = -7",
+        "expectedAnswer": "x=-5, y=5, z=4"
+      },
+      {
+        "id": "q39",
+        "expression": "3x + 2y + z = -1 | 3x + y + z = 3 | 2x + y - z = -6",
+        "expectedAnswer": "x=1, y=-4, z=4"
+      }
     ]
   }
 ]
